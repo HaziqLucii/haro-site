@@ -242,7 +242,7 @@ class Component extends DCLogic {
       shots:[['s-triage','01','triage','What needs you, first','Drop a screenshot: triage dashboard'],['s-agent','02','agent','The agent at work','Drop a screenshot: agent step'],['s-red','03','red','A red gate with a tamper alarm','Drop a screenshot: verify, red'],['s-ship','04','ship','Merge on green, with a receipt','Drop a screenshot: ship step']].map(([id,n,k,t,ph])=>({id,n,k,t,ph})),
       installs:inst.map(i=>({...i,copy:()=>this.copy(i.k,i.cmd),copyLabel:this.state.copied===i.k?'COPIED':'COPY'})),
       works:['Parallel agents in worktrees','Auto-run test gate','Lines no test ran','Tamper alarm','Local merge and GitHub PRs'].map(t=>({t})),
-      notyet:['Signed releases','macOS builds','Runners beyond Vitest and pytest','Team sync','A stable config format'].map(t=>({t})),
+      notyet:['Packaged downloads (AppImage, .deb)','macOS packages','Signed releases','Team sync','A stable config format'].map(t=>({t})),
       faq:[
         ['What is haro?','A desktop app that runs several AI coding agents at once, each in its own git worktree, and blocks any of their work from merging until your tests pass.'],
         ['Is it free and open source?','Yes. The source is on GitHub at HaziqLucii/haro-oss, and it runs entirely on your machine.'],
@@ -251,7 +251,7 @@ class Component extends DCLogic {
         ['What counts as green?','Whatever your project says. You pick the runner and folder once in project settings, and every workspace inherits it. Advisory checks never block a merge; failures always do.'],
         ['Does it work on macOS?','It runs, but Linux gets tested first. Windows isn’t supported yet.']].map(([q,a])=>({q,a})),
       footCols:[
-        {t:'Project',links:[['Source',REPO],['Releases',REPO+'/releases'],['Issues',REPO+'/issues']]},
+        {t:'Project',links:[['Source',REPO],['Changelog',REPO+'/blob/main/CHANGELOG.md'],['Issues',REPO+'/issues']]},
         {t:'Learn',links:[['What it is','#what'],['The gate','#gate'],['FAQ','#faq']]}].map(c=>({t:c.t,links:c.links.map(([l,h])=>({l,h}))}))
     };
   }

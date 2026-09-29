@@ -102,7 +102,7 @@ summary{list-style:none;cursor:pointer}summary::-webkit-details-marker{display:n
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:56px;margin-top:22px;align-items:start">
       <div>
         <h2 style="font-size:clamp(30px,4vw,52px);font-weight:500;letter-spacing:-.025em;line-height:1.08;margin:0;text-wrap:balance">Green is only the start of the proof.</h2>
-        <p style="font-size:17px;line-height:1.55;color:rgba(216,208,197,.66);max-width:560px;margin:18px 0 0">The gate runs by itself when an agent finishes. You get the verdict first, then the few spots that need a human, then the evidence on demand. Merging stays locked until it’s green.</p>
+        <p style="font-size:17px;line-height:1.55;color:rgba(216,208,197,.66);max-width:560px;margin:18px 0 0">The gate runs by itself when an agent finishes. You get the verdict first, then the few spots that need a human, then the evidence on demand. Merging stays locked until it’s green. Every verdict comes from running real code: haro never asks an AI whether AI-written code is correct.</p>
         <div style="margin-top:36px;border-top:1px solid rgba(216,208,197,.2)">
           <sc-for list="{{ proofs }}" as="p" hint-placeholder-count="4">
             <div style="display:grid;grid-template-columns:14px minmax(0,1fr);gap:16px;padding:18px 0;border-bottom:1px solid rgba(216,208,197,.08)">
@@ -233,7 +233,7 @@ class Component extends DCLogic {
         {n:'03',k:'verify',kanji:'証',t:'Watch the gate',d:'Tests start by themselves when the agent is done. Green, red, and what needs your eyes.'},
         {n:'04',k:'ship',kanji:'出',t:'Merge on green',d:'Commit, merge or open a PR. The button stays locked until the gate is green.'}],
       proofs:[
-        {c:G,t:'A verdict you can read in a second',d:'One word, one colour, one next step. Green is reserved for the gate, so it never means anything else.'},
+        {c:G,t:'A verdict you can read in a second',d:'One word, one colour, one next step, decided by your tests and never by a model. Green is reserved for the gate, so it never means anything else.'},
         {c:'#d8d0c5',t:'Lines no test ran',d:'A green suite can still skip your change. haro lists the added lines that no passing test executed.'},
         {c:'#d8d0c5',t:'Mutation score',d:'haro plants small mistakes in the diff and checks whether the tests notice. If they don’t, you’ll know.'},
         {c:R,t:'Tamper alarm',d:'If an agent deletes or weakens a test to get to green, the gate says so, loudly.'}],
@@ -247,8 +247,8 @@ class Component extends DCLogic {
         ['What is haro?','A desktop app that runs several AI coding agents at once, each in its own git worktree, and blocks any of their work from merging until your tests pass.'],
         ['Is it free and open source?','Yes. The source is on GitHub at HaziqLucii/haro-oss, and it runs entirely on your machine.'],
         ['Why a desktop app and not a web app?','haro drives real processes on your machine: git worktrees, your test runner, a terminal and your dev server. A native window keeps all of that local and fast, and it opens your own editor and browser when you need them.'],
-        ['Which agents does it support?','Claude Code today, plus OpenAI-compatible local models such as Ollama and llama.cpp. You can give plan, build and review their own model.'],
-        ['What counts as green?','Whatever your project says. You pick the runner and folder once in project settings, and every workspace inherits it. Advisory checks never block a merge; failures always do.'],
+        ['Which agents does it support?','Claude Code today, plus OpenAI-compatible local models such as Ollama and llama.cpp. Planning and building can each use their own model, and Review with AI asks a model to read the diff before you merge, if you want a second opinion.'],
+        ['What counts as green?','Your tests, and nothing else: no AI decides it. You pick the runner and folder once in project settings, and every workspace inherits it. Advisory checks, like a possible secret or an AI review, never block a merge; failures always do.'],
         ['Does it work on macOS?','It runs, but Linux gets tested first. Windows isn’t supported yet.']].map(([q,a])=>({q,a})),
       footCols:[
         {t:'Project',links:[['Source',REPO],['Changelog',REPO+'/blob/main/CHANGELOG.md'],['Issues',REPO+'/issues']]},

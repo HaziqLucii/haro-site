@@ -3,9 +3,8 @@
 The landing page for [haro](https://github.com/HaziqLucii/haro-oss), served with GitHub Pages at
 https://haziqlucii.github.io/haro-site/.
 
-`index.html` (desktop) and `m.html` (phones, 760px and below; each page redirects to the other) are the
-Claude Design landing pages. They render through the small runtime in `support.js` (React and Babel
-from unpkg). Screenshots are plain `<img>` tags, so touches always scroll; `shots/` holds the screenshots, taken
-from the haro desktop app in its capture mode, and `fonts/` the brand fonts.
+One static page that works on phones and desktops: `index.html`, `styles.css` and `script.js`, with
+the brand fonts in `fonts/` and the screenshots in `shots/` (taken from the haro desktop app in its
+capture mode). No build step and no runtime. `m.html` only redirects old links to the page.
 
-Downloads are marked coming soon until the first packaged release (AppImage, `.deb`) exists.
+The source of this page lives in the haro repo under `app/design/landing/site-v2/`.

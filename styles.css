@@ -124,10 +124,6 @@ h2{font-weight:500;margin:0}
 figcaption{font-style:italic;font-size:15px;color:rgba(216,208,197,.66);padding:14px 4px 4px}
 .pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:24px;margin:24px auto 0;max-width:980px}
 
-.badge{display:inline-flex;align-items:center;gap:12px;margin-top:26px;padding:10px 14px;border:1px solid var(--sys);background:rgba(10,14,20,.6);font-family:var(--mono);font-size:12px;letter-spacing:.08em}
-.b-k{color:var(--sys)}
-.b-n{font-size:22px;font-weight:700}
-.b-v{color:rgba(216,208,197,.42)}
 
 /* gate box */
 .gatebox{max-width:980px;margin:48px auto 0;border:1px solid rgba(216,208,197,.14);background:var(--panel);padding:18px 20px}

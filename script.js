@@ -31,7 +31,6 @@
     if (q === 'XP') xpSeen();
     if (el.dataset.levelup) levelUp(); else toast('QUEST DISCOVERED', q);
     if (q === 'The gate') gateDemo();
-    if (q === 'The assistant') countAi();
   }
 
   function check() {
@@ -122,20 +121,6 @@
       if (n >= 72) clearInterval(gi);
       renderGate(n);
     }, 45);
-  }
-
-  /* ---------- AI edits counter ---------- */
-  var ai = 0, aiN = 3;
-  function countAi() {
-    clearInterval(ai);
-    if (reduced()) { $('aiEdits').textContent = '0'; return; }
-    aiN = 3;
-    $('aiEdits').textContent = aiN;
-    ai = setInterval(function () {
-      if (aiN <= 0) { clearInterval(ai); return; }
-      aiN--;
-      $('aiEdits').textContent = aiN;
-    }, 450);
   }
 
   /* ---------- hero system window ---------- */

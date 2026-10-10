@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>haro. Arise, Developers.</title>
-<meta name="description" content="Some days you'll hand it all to AI. Other days you'll want to write it yourself, the way we used to. haro is built for both. Local first, Linux first.">
+<title>haro. You stay the author.</title>
+<meta name="description" content="A workbench for developers who still want to understand what ships. Write it yourself, or hand it to an agent you fence to the files you name. The receipt says who wrote what. Local first, Linux first.">
 <meta name="theme-color" content="#0b0a09">
 <meta name="color-scheme" content="dark">
-<meta property="og:title" content="haro. Arise, Developers.">
-<meta property="og:description" content="Some days you'll hand it all to AI. Other days you'll want to write it yourself, the way we used to. haro is built for both.">
+<meta property="og:title" content="haro. You stay the author.">
+<meta property="og:description" content="Write it yourself, or hand it to an agent you fence to the files you name. The receipt says who wrote what.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://haziqlucii.github.io/haro-site/">
-<meta property="og:image" content="https://haziqlucii.github.io/haro-site/shots/shot-manual.jpg">
+<meta property="og:image" content="https://haziqlucii.github.io/haro-site/shots/shot-review.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://haziqlucii.github.io/haro-site/">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -19,306 +19,354 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="root" id="root">
-  <div class="scan" aria-hidden="true"></div>
+<div class="root">
   <a class="skip" href="#main">Skip to content</a>
 
   <nav class="nav" aria-label="Main">
-    <a class="logo" href="#top">haro.</a>
-    <div class="links">
-      <a href="#manual">Manual mode</a><a href="#gate">Gate</a><a href="#xp">XP</a><a href="#agent">Agent</a><a href="#faq">FAQ</a>
+    <a class="brand" href="#top" aria-label="haro, back to the top">
+      <span class="mark mark-nav" data-mark="0.5" aria-hidden="true"></span>
+      <span class="word">haro.</span>
+    </a>
+    <div class="nav-links" id="nav-links">
+      <a href="#manual">Manual</a>
+      <a href="#fence">Fence</a>
+      <a href="#receipt">Receipt</a>
+      <a href="#gate">Gate</a>
+      <a href="#agent">Agent</a>
+      <a href="#download">Download</a>
     </div>
     <span class="grow"></span>
-    <a class="btn ghost sm" href="https://github.com/HaziqLucii/haro-oss">GitHub</a>
-    <a class="btn solid sm" href="#download">Download</a>
+    <a class="btn btn-line btn-sm" href="https://github.com/HaziqLucii/haro-oss">GitHub</a>
+    <a class="btn btn-fill btn-sm" href="#download">Download</a>
   </nav>
 
-  <header id="top" class="hero">
-    <canvas class="particles" id="particles" aria-hidden="true"></canvas>
-    <div class="kana" aria-hidden="true">モノクローム</div>
-    <div class="hero-copy" data-reveal="0">
-      <div class="hero-eyebrow"><span class="dot"></span>[ SYSTEM ] A GATE HAS OPENED</div>
-      <h1>Arise, Developers.</h1>
-      <p class="hero-lede">Some days you’ll hand it all to AI. Other days you’ll want to write it yourself, the way we used to. haro is built for both.</p>
-      <div class="hero-cta">
-        <a class="btn solid lg glow" href="https://github.com/HaziqLucii/haro-oss/releases/download/v0.10.6/haro-0.10.6-x86_64.AppImage">Download for Linux</a>
-        <a class="btn ghost lg see" href="#manual">See it work</a>
+  <header class="hero" id="top">
+    <div class="watermark" aria-hidden="true">モノクローム</div>
+    <div class="side-note" aria-hidden="true">// haro · you stay the author · linux first</div>
+    <div class="wrap hero-grid">
+      <div class="reveal">
+        <div class="meta-row"><span>RELEASE V0.11.0</span><span>LINUX X86_64</span><span>MIT</span><span class="g">GREEN = THE GATE</span></div>
+        <h1>You stay the author.</h1>
+        <p class="lead">Write it yourself, or hand it to an agent and fence it to the files you name. Either way, the receipt tells the truth about who wrote what, and nothing merges until your tests pass.</p>
+        <div class="cta">
+          <a class="btn btn-fill btn-lg" href="https://github.com/HaziqLucii/haro-oss/releases/download/v0.11.0/haro-0.11.0-x86_64.AppImage">Download for Linux <span class="mono tiny">AppImage</span></a>
+          <a class="btn btn-line btn-lg" href="#manual">See it work</a>
+        </div>
       </div>
-      <div class="hero-meta">
-        <div><div class="k">Release</div><div class="v">v0.10.6</div></div>
-        <div><div class="k">Platform</div><div class="v">Linux x86_64</div></div>
-        <div><div class="k">License</div><div class="v">MIT</div></div>
+      <div class="reveal d1 hero-mark-wrap">
+        <div class="hero-mark">
+          <div class="mark mark-hero" data-mark="4" data-phase="hero" role="img" aria-label="The haro mark: queued, running, gate green, merged"></div>
+          <div class="mark-labels" aria-hidden="true">
+            <div class="ml" data-need="0" style="top:13px"><i></i><span>1 · QUEUED</span></div>
+            <div class="ml" data-need="1" style="top:101px"><i></i><span>2 · RUNNING</span></div>
+            <div class="ml" data-need="2" style="top:183px"><i></i><span id="ml-gate">3 · GATE · GREEN</span></div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="hero-stage" data-reveal="1">
-      <div class="frame f0"></div>
-      <div class="frame f1"></div>
-      <div class="frame f2"></div>
-      <div class="syswin">
-        <div class="sw-head"><span>[ SYSTEM ]</span><span id="sysLv">LV. 7</span></div>
-        <div class="sw-rule"></div>
-        <div class="sw-body" aria-hidden="true"><span id="sysLines"></span><span class="cursor"></span></div>
-        <p class="sr">Daily quest: ship one change on green. Tests 18 / 18. Tamper alarm clean. Reward +120 XP.</p>
-        <div class="sw-track"><div class="sw-fill" id="sysXp"></div></div>
-        <div class="sw-foot">
-          <span class="rank" id="sysRank">RANK  Novice</span>
-          <a class="accept" id="sysAccept" href="#download">ACCEPT</a>
+
+    <div class="wrap reveal">
+      <div class="modebox">
+        <div class="mode-head">
+          <span class="label">WHO WRITES THE CODE</span>
+          <div class="seg" role="group" aria-label="Who writes the code">
+            <button type="button" data-mode="agent" aria-pressed="false">AGENT</button>
+            <button type="button" data-mode="manual" aria-pressed="true">MANUAL</button>
+          </div>
+          <span class="mode-line" id="mode-line">You write every line. Three steps.</span>
         </div>
+        <div class="steps" id="steps"></div>
       </div>
     </div>
   </header>
 
   <main id="main">
-    <section id="manual" data-quest="Manual mode" class="sec s120">
-      <div class="shead" data-reveal="0">
+    <section id="manual" class="sec">
+      <div class="wrap two reveal">
         <div>
-          <div class="eyebrow">01 // Manual mode</div>
-          <h2 class="h-sec">Build by hand. The agent steps aside.</h2>
+          <div class="eyebrow">01 · MANUAL MODE</div>
+          <h2>Write it yourself. The agent is switched off.</h2>
         </div>
-        <p class="body mw560 mt34">Remember when you wrote the code yourself? Switch a workspace to Manual and the agent steps aside. You write it, test it and ship it. haro helps you plan, finds what you need, and keeps score.</p>
+        <div class="copy">
+          <p>Flip a workspace to Manual and the agent cannot start: haro refuses every run. You write it, run the tests and ship it. The built-in editor has a file tree, search, tabs, split view and a terminal, right next to your tests.</p>
+          <p>Lines the passing suite actually ran get a small mark in the gutter, so you can see what is covered while you write.</p>
+        </div>
       </div>
-      <figure class="fig wide top" data-reveal="1">
-        <div class="fh"><span>[ SYSTEM · 01 ]</span><span>MANUAL WORKSPACE</span></div>
-        <a href="shots/shot-manual.jpg"><img class="shot" src="shots/shot-manual.jpg" alt="A manual workspace on the code step with the Plan tab open and a green gate."></a>
-        <figcaption>And when it ships, the receipt says you wrote it.</figcaption>
+      <figure class="shot-fig reveal d1">
+        <button type="button" class="shot" data-shot="0"><img src="shots/shot-manual.jpg" alt="A manual workspace on the code step, with the plan checklist in the rail." loading="lazy"></button>
+        <figcaption><span>manual workspace · code step</span><span>When it ships, the receipt says you wrote it.</span></figcaption>
       </figure>
     </section>
 
-    <section data-quest="The assistant" class="sec s140">
-      <div class="shead" data-reveal="0">
+    <section id="assistant" class="sec">
+      <div class="wrap two reveal">
         <div>
-          <div class="eyebrow">02 // The assistant</div>
-          <h2 class="h-sec">An assistant that helps you think, not type.</h2>
-        </div>
-        <div class="mt34">
-          <p class="body mw560 m0">In manual mode, haro’s AI can read your code and the web, but it can’t touch a single file. Ask it to plan and you get a checklist, with the reason for the order. Ask where something lives and it points you to the file, the commit or the docs. It won’t hand you code to paste. That part is yours.</p>
-          <p class="body mw560 mt16">haro checks your files before and after every answer, so when the receipt says “AI edits: 0”, it means it. If something else was writing at the same time, it says “unverified” instead.</p>
-        </div>
-      </div>
-      <figure class="fig wide top" data-reveal="1">
-        <div class="fh"><span>[ SYSTEM · 02 ]</span><span>SEARCH</span></div>
-        <a href="shots/shot-search.jpg"><img class="shot" src="shots/shot-search.jpg" alt="The rail on the Search tab, pointing to logSession and isRealDate in src/sessions.ts. AI edits: 0."></a>
-      </figure>
-    </section>
-
-    <section data-quest="A real editor" class="sec s140">
-      <div class="shead" data-reveal="0">
-        <div>
-          <div class="eyebrow">03 // A real editor, inside haro</div>
-          <h2 class="h-sec">Everything you need, in one window.</h2>
-        </div>
-        <p class="body mw560 mt34">A file tree, search, tabs, split view and a terminal, right next to your tests. Lines your tests actually ran get a small mark in the gutter, so you can see what’s covered while you work. Turn on run on save and the gate checks your work every time you hit save.</p>
-      </div>
-      <figure class="fig wide top" data-reveal="1">
-        <div class="fh"><span>[ SYSTEM · 03 ]</span><span>CODE STEP</span></div>
-        <a href="shots/shot-code.jpg"><img class="shot" src="shots/shot-code.jpg" alt="The code step: an explorer with A and M letters, a diff with breadcrumbs, and the status bar."></a>
-      </figure>
-    </section>
-
-    <section id="gate" data-quest="The gate" class="sec s140 rel">
-      <div class="shead" data-reveal="0">
-        <div>
-          <div class="eyebrow">04 // The gate</div>
-          <h2 class="h-sec">Your test suite decides. Not an LLM.</h2>
-        </div>
-        <p class="body mw560 mt34">Green means your own test suite passed, on your own machine. If a test gets deleted, skipped or quietly loosened, the tamper alarm catches it. Wondering if your tests would even notice a bug? The mutation score breaks your new code on purpose and finds out. Anything worth a second look shows up for you, without getting in your way.</p>
-      </div>
-      <div data-reveal="1" class="gatebox">
-        <div class="gb-head"><span class="gb-title">[ GATE ] CLEARING</span><span id="gateKey" class="gb-key">WAITING</span></div>
-        <div class="cells" id="gateCells" aria-hidden="true"></div>
-        <div class="gb-foot"><span id="gateCount">0 / 18 passed</span><span>tamper alarm · clean</span><span>mutation · <span id="gateMut">…</span></span></div>
-      </div>
-      <div class="pair">
-        <figure class="fig pgreen" data-reveal="0">
-          <div class="fh green"><span>[ GATE CLEARED ]</span><span>VERIFY</span></div>
-          <a href="shots/shot-verify.jpg"><img class="shot" src="shots/shot-verify.jpg" alt="The verify step with a green verdict: all 15 tests pass."></a>
-          <figcaption>Green, 15 of 15</figcaption>
-        </figure>
-        <figure class="fig pred" data-reveal="1">
-          <div class="fh red"><span>[ WARNING ]</span><span>TAMPER ALARM</span></div>
-          <a href="shots/shot-red.jpg"><img class="shot" src="shots/shot-red.jpg" alt="The verify step with a red verdict: the tamper alarm reports that the agent weakened the test suite in 2 places, and the merge is blocked."></a>
-          <figcaption>Red, tamper alarm</figcaption>
-        </figure>
-      </div>
-    </section>
-
-    <section data-quest="Ship with a receipt" class="sec s140">
-      <div class="shead" data-reveal="0">
-        <div>
-          <div class="eyebrow">05 // Ship with a receipt</div>
-          <h2 class="h-sec">A receipt that says who wrote it.</h2>
-        </div>
-        <p class="body mw560 mt34">You can only merge on green. The pull request gets a receipt with the test results, the tamper check, and an honest answer to who wrote the code: you, the agent, or both of you.</p>
-      </div>
-      <figure class="fig wide top" data-reveal="1">
-        <div class="fh"><span>[ SYSTEM · 05 ]</span><span>SHIP</span></div>
-        <a href="shots/shot-ship.jpg"><img class="shot" src="shots/shot-ship.jpg" alt="The ship step with the merge panel and a receipt reading Written by: HaziqLucii, the linked GitHub account."></a>
-      </figure>
-    </section>
-
-    <section id="xp" data-quest="XP" data-levelup="1" class="sec s140">
-      <div class="shead" data-reveal="0">
-        <div>
-          <div class="eyebrow">06 // XP</div>
-          <h2 class="h-sec">Leveling up.</h2>
-        </div>
-        <p class="body mw560 mt34">Levels, ranks from Novice to Master, a streak and a few badges. It's there for a little fun, a small pat on the back when your work ships.</p>
-      </div>
-      <div data-reveal="1" class="ranks" id="ranks">
-        <div class="rank-cell lit" data-i="0"><div class="rk-n">I</div><div class="rk-t">Novice</div><div class="rk-bar"><div class="rk-fill"></div></div></div>
-        <div class="rank-cell lit" data-i="1"><div class="rk-n">II</div><div class="rk-t">Journeyman</div><div class="rk-bar"><div class="rk-fill"></div></div></div>
-        <div class="rank-cell" data-i="2"><div class="rk-n">III</div><div class="rk-t">Craftsman</div><div class="rk-bar"><div class="rk-fill"></div></div></div>
-        <div class="rank-cell" data-i="3"><div class="rk-n">IV</div><div class="rk-t">Master</div><div class="rk-bar"><div class="rk-fill"></div></div></div>
-      </div>
-      <div class="rewards" id="rewards">
-        <span class="reward"><span class="rv">+120</span>red to green, by hand</span>
-        <span class="reward"><span class="rv">+40</span>caught a surviving mutant</span>
-        <span class="reward"><span class="rv">+30</span>started from a failing test</span>
-      </div>
-      <div class="pair">
-        <figure class="fig plain" data-reveal="0"><div class="fl">[ STATUS ] HOW XP WORKS</div><a href="shots/shot-xp.jpg"><img class="shot" src="shots/shot-xp.jpg" alt="The How XP works popover above the sidebar footer."></a></figure>
-        <figure class="fig plain" data-reveal="1"><div class="fl">[ STATUS ] +10 XP</div><a href="shots/shot-xp-triage.jpg"><img class="shot" src="shots/shot-xp-triage.jpg" alt="The merged ship step with a +10 XP toast and the XP footer in the sidebar."></a></figure>
-      </div>
-    </section>
-
-    <section id="agent" data-quest="Agent mode" class="sec s140">
-      <div class="shead" data-reveal="0">
-        <div>
-          <div class="eyebrow">07 // Agent mode</div>
-          <h2 class="h-sec">Hand over the wheel when you just need it shipped.</h2>
-        </div>
-        <p class="body mw560 mt34">Short on time? Switch the workspace to Agent and describe the task. The agent works in its own copy of your repo, and the same gate, tamper alarm and receipt apply. You can switch halfway too. haro saves your part first, so the receipt shows you both. It can hand lookups and reviews to sub-agents on cheaper models you choose, and you can open any of them fullscreen.</p>
-      </div>
-      <figure class="fig wide top" data-reveal="1">
-        <div class="fh"><span>[ SYSTEM · 07 ]</span><span>AGENT RUNNING</span></div>
-        <a href="shots/shot-agent.jpg"><img class="shot" src="shots/shot-agent.jpg" alt="The agent step mid-run with tool lines streaming and a scout sub-agent working in the rail."></a>
-      </figure>
-      <figure class="fig wide" data-reveal="2">
-        <div class="fh"><span>[ SYSTEM · 07 ]</span><span>SUB-AGENTS</span></div>
-        <a href="shots/shot-subagents.jpg"><img class="shot" src="shots/shot-subagents.jpg" alt="A finished agent run with a scout and a code-review sub-agent listed in the rail, a findings table in the message, and the gate green."></a>
-      </figure>
-      <figure class="fig wide" data-reveal="3">
-        <div class="fh"><span>[ SYSTEM · 07 ]</span><span>SUB-AGENT, FULLSCREEN</span></div>
-        <a href="shots/shot-subagent-full.jpg"><img class="shot" src="shots/shot-subagent-full.jpg" alt="One sub-agent opened fullscreen, showing every step it took with the full file paths."></a>
-      </figure>
-    </section>
-
-    <section data-quest="Dashboard" class="sec s140">
-      <div class="shead" data-reveal="0">
-        <div>
-          <div class="eyebrow">08 // Dashboard</div>
-          <h2 class="h-sec">See what needs you, at a glance.</h2>
-        </div>
-        <p class="body mw560 mt34">All your workspaces in one list, sorted by what they need: your attention, still running, ready to ship, or done. Each one shows you the next step.</p>
-      </div>
-      <figure class="fig wide top" data-reveal="1">
-        <div class="fh"><span>[ SYSTEM · 08 ]</span><span>DASHBOARD</span></div>
-        <a href="shots/shot-triage.jpg"><img class="shot" src="shots/shot-triage.jpg" alt="The dashboard: workspaces grouped by what they need (needs you, running, ready to ship, idle), each with one action."></a>
-      </figure>
-    </section>
-
-    <section data-quest="Local first" class="sec s140">
-      <div data-reveal="0" class="local">
-        <h2><span class="lf-n">09 //</span>Local first, Linux first</h2>
-        <p class="body mw600 m0">Everything runs on your machine, against your own repo. The assistant uses your own Claude Code login, and pull requests go through your own <code>gh</code>. No GitHub app to install, and no broad permissions to hand over.</p>
-      </div>
-    </section>
-
-    <section id="download" data-quest="Download" class="sec s160">
-      <div data-reveal="0" class="head-center-plain">
-        <div class="eyebrow wide">[ SYSTEM ] WILL YOU ACCEPT?</div>
-        <h2 class="h-dl">Download</h2>
-      </div>
-      <div class="installs">
-        <div class="install" data-reveal="1">
-          <h3>AppImage</h3>
-          <div class="cmd">
-            <span class="cmd-text"><span class="prompt">$ </span><code data-cmd>curl -LO https://github.com/HaziqLucii/haro-oss/releases/download/v0.10.6/haro-0.10.6-x86_64.AppImage &amp;&amp; chmod +x haro-0.10.6-x86_64.AppImage &amp;&amp; ./haro-0.10.6-x86_64.AppImage</code></span>
-            <button type="button" class="copy" data-copy="AppImage" aria-label="Copy the AppImage command">COPY</button>
+          <div class="eyebrow">02 · THE ASSISTANT</div>
+          <h2>An assistant that helps you think, not type.</h2>
+          <div class="trio" aria-label="What the assistant does in manual mode">
+            <div><span class="label">PLAN</span><b>checklist</b></div>
+            <div><span class="label">SEARCH</span><b>pointers</b></div>
+            <div><span class="label">AI EDITS</span><b>0 inside haro</b></div>
           </div>
-          <a class="dl-link" href="https://github.com/HaziqLucii/haro-oss/releases/download/v0.10.6/haro-0.10.6-x86_64.AppImage">Download the file</a>
         </div>
-        <div class="install" data-reveal="1">
-          <h3>Tarball</h3>
-          <div class="cmd">
-            <span class="cmd-text"><span class="prompt">$ </span><code data-cmd>curl -L https://github.com/HaziqLucii/haro-oss/releases/download/v0.10.6/haro-0.10.6-linux-x86_64.tar.gz | tar xz &amp;&amp; ./haro-0.10.6-linux-x86_64/install.sh</code></span>
-            <button type="button" class="copy" data-copy="Tarball" aria-label="Copy the tarball command">COPY</button>
+        <div class="copy">
+          <p>In Manual mode haro's assistant can read your code, your git history and the web, and nothing else. Ask for a plan and you get a checklist with the reason for the order. Ask where something lives and it points you to the file, the commit or the docs. Code in its answers is stripped, so it points and you write.</p>
+          <p>haro compares your files before and after every answer, so "AI edits: 0" is checked, not claimed. If something else was writing at the same moment, it says "unverified" instead.</p>
+        </div>
+      </div>
+      <figure class="shot-fig reveal d1">
+        <button type="button" class="shot" data-shot="1"><img src="shots/shot-search.jpg" alt="The Search tab: a short answer with its sources, grouped by repo, git and docs." loading="lazy"></button>
+        <figcaption><span>search · answers point to sources, never paste code</span></figcaption>
+      </figure>
+    </section>
+
+    <section id="fence" class="sec">
+      <div class="wrap two reveal">
+        <div>
+          <div class="eyebrow">03 · THE FENCE</div>
+          <h2>Hand the agent only what you name.</h2>
+        </div>
+        <div class="copy">
+          <p>Type the files it may edit into the Scope box under the prompt. If it reaches outside them, haro usually refuses the edit before it is written and tells the agent why. Whatever still lands outside (a shell command can do that) is put back when the run ends, and what the agent wrote there is kept aside, so nothing is lost.</p>
+          <p>Your own uncommitted work is never touched. The fence is opt-in: an empty Scope box means no fence, and the receipt says so.</p>
+        </div>
+      </div>
+      <figure class="shot-fig reveal d1">
+        <button type="button" class="shot" data-shot="2"><img src="shots/shot-fence.jpg" alt="The agent step with a task typed in and the Scope box holding two files." loading="lazy"></button>
+        <figcaption><span>agent step · the Scope box</span><span>haro checks the result, because the agent's shell can write anywhere.</span></figcaption>
+      </figure>
+    </section>
+
+    <section id="review" class="sec">
+      <div class="wrap two reveal">
+        <div>
+          <div class="eyebrow">04 · REVIEW</div>
+          <h2>Read what ships before it ships.</h2>
+        </div>
+        <div class="copy">
+          <p>The Review step opens on an overview: what was asked, how far the agent was allowed to go, and how big the change is, with a plain estimate of how long it takes to read well. Then the files, riskiest first: lines no test ran, new dependencies, a weaker test, a possible secret.</p>
+          <p>Mark each file Viewed and it folds away. Once every file is viewed and the tests are green, Proceed to ship unlocks. haro keeps count of what you marked and how long each diff was open, and puts it on the receipt as a plain fact, never as "reviewed".</p>
+        </div>
+      </div>
+      <figure class="shot-fig reveal d1">
+        <button type="button" class="shot" data-shot="3"><img src="shots/shot-review.jpg" alt="The review Overview: intent, fence, size with the reading pace, and the list of things that need your review." loading="lazy"></button>
+        <figcaption><span>review step · overview</span><span>Things haro noticed but cannot judge for you.</span></figcaption>
+      </figure>
+    </section>
+
+    <section id="receipt" class="sec">
+      <div class="wrap two reveal">
+        <div>
+          <div class="eyebrow">05 · SHIP WITH A RECEIPT</div>
+          <h2>A receipt that says who wrote what.</h2>
+        </div>
+        <div class="copy">
+          <p>You can only merge on green. The pull request gets a receipt: the test results, the fence the agent ran under, the tamper check, how the diff was read, and an honest answer to who wrote the code. Files you edited yourself, in any editor, are listed, so it only says "you and the agent" where that is true.</p>
+          <p>It describes what happened inside haro. It cannot see another AI tool open beside it, so it never says "no AI wrote this".</p>
+        </div>
+      </div>
+      <div class="wrap two-fig">
+        <div class="card reveal" aria-label="An example receipt">
+          <div class="card-head"><span>GATE RECEIPT</span><span class="dim">EXAMPLE</span></div>
+          <div class="row"><i class="sq g"></i><span>Suite</span><span class="mono">18 / 18 passed</span></div>
+          <div class="row"><i class="sq"></i><span>Written by</span><span class="mono">you and the agent (1 file by hand)</span></div>
+          <div class="row"><i class="sq"></i><span>Scope</span><span class="mono">2 paths (1 of 1 run)</span></div>
+          <div class="row"><i class="sq dim"></i><span>Tamper alarm</span><span class="mono">clean</span></div>
+          <div class="row"><i class="sq dim"></i><span>Review in haro</span><span class="mono">Viewed 2 of 2 files</span></div>
+          <div class="card-foot"><span class="btn btn-fill btn-block" aria-hidden="true">Merge into main</span></div>
+        </div>
+        <figure class="reveal d1 span2">
+          <button type="button" class="shot" data-shot="4"><img src="shots/shot-ship.jpg" alt="The ship step with the receipt and the merge panel." loading="lazy"></button>
+          <figcaption><span>ship step · merge stays locked until green</span></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="gate" class="sec">
+      <div class="wrap two reveal">
+        <div>
+          <div class="eyebrow">06 · THE GATE</div>
+          <h2>Underneath it all, your tests decide.</h2>
+        </div>
+        <div class="copy">
+          <p>The safety net is quiet and automatic. Green means your own test suite passed, on your own machine, and no model gets a vote. If a test gets deleted, skipped or quietly loosened, the tamper alarm catches it, and the merge stays blocked until the suite is green again.</p>
+          <p>Lines no test ran are marked in the diff, so a big change shrinks to the part nothing checked.</p>
+        </div>
+      </div>
+      <div class="wrap">
+        <div class="gate reveal d1" id="gate-demo" data-state="idle">
+          <div class="gate-head">
+            <i class="sq" id="g-sq"></i><span class="gkey" id="g-key">NOT RUN</span>
+            <span class="dim mono tiny" id="g-when">illustration · waiting</span>
+            <span class="grow"></span>
+            <button type="button" class="btn btn-line btn-xs" id="g-rerun">Run again</button>
           </div>
-          <a class="dl-link" href="https://github.com/HaziqLucii/haro-oss/releases/download/v0.10.6/haro-0.10.6-linux-x86_64.tar.gz">Download the file</a>
+          <div class="gate-title" id="g-head">Scroll here to run it</div>
+          <div class="bar"><div id="g-bar"></div></div>
+          <div class="metrics">
+            <div><span class="label">TESTS</span><b id="g-tests">0 / 18</b></div>
+            <div><span class="label">TAMPER</span><b>clean</b></div>
+            <div><span class="label">COVERAGE</span><b id="g-cov">…</b></div>
+            <div><span class="label">MERGE</span><b id="g-merge">blocked</b></div>
+          </div>
+          <div class="gate-foot"><span><span class="label">NEEDS YOUR REVIEW </span>1 · lines no test ran</span><span class="dim mono tiny">advisory · never blocks</span></div>
         </div>
-      </div>
-      <p data-reveal="0" class="source">Build from source: <a href="https://github.com/HaziqLucii/haro-oss">github.com/HaziqLucii/haro-oss</a></p>
-    </section>
-
-    <section class="sec s140">
-      <h2 data-reveal="0" class="h-sm">Where it is today</h2>
-      <div data-reveal="1" class="today">
-        <div>
-          <h3 class="th works">Works today</h3>
-          <div class="row"><span class="ic">✓</span><span>Manual mode (plan, search, docs, editor, terminal)</span></div>
-          <div class="row"><span class="ic">✓</span><span>Agent or manual per workspace</span></div>
-          <div class="row"><span class="ic">✓</span><span>Test gate, tamper alarm, mutation score</span></div>
-          <div class="row"><span class="ic">✓</span><span>Gate receipt with “written by”</span></div>
-          <div class="row"><span class="ic">✓</span><span>XP, rank, streak, badges</span></div>
-          <div class="row"><span class="ic">✓</span><span>First-run baseline on your default branch</span></div>
-          <div class="row"><span class="ic">✓</span><span>Local merge and GitHub PRs via gh</span></div>
-        </div>
-        <div>
-          <h3 class="th notyet">Not yet</h3>
-          <div class="row dim"><span class="ic">○</span><span>Offline framework docsets (man pages work offline today)</span></div>
-          <div class="row dim"><span class="ic">○</span><span>Windows</span></div>
+        <div class="pair">
+          <figure class="reveal">
+            <button type="button" class="shot shot-green" data-shot="5"><img src="shots/shot-verify.jpg" alt="The review step with a green verdict and the start of the Overview." loading="lazy"></button>
+            <figcaption class="cap-state"><i class="sq g"></i>Green, tests passed</figcaption>
+          </figure>
+          <figure class="reveal d1">
+            <button type="button" class="shot shot-red" data-shot="6"><img src="shots/shot-red.jpg" alt="The review step with a red verdict: the tamper alarm reports a weakened suite and the merge is blocked." loading="lazy"></button>
+            <figcaption class="cap-state"><i class="sq r"></i>Red, tamper alarm</figcaption>
+          </figure>
         </div>
       </div>
     </section>
 
-    <section id="faq" class="sec s140">
-      <h2 data-reveal="0" class="h-sm">FAQ</h2>
-      <div data-reveal="1" class="faq">
-        <details><summary><span>Is this anti-AI?</span><span class="plus">+</span></summary><div class="ans">No. haro is against unchecked code, not against AI. Agent mode is right there, behind the same gate. Use it when you want the work done for you, and manual mode when you want to write it yourself.</div></details>
-        <details><summary><span>Can the AI write code in manual mode?</span><span class="plus">+</span></summary><div class="ans">No. It can’t edit files or run commands, and haro checks your files before and after every answer. If an answer includes code, haro strips it out.</div></details>
-        <details><summary><span>What stops me farming XP?</span><span class="plus">+</span></summary><div class="ans">Small daily rewards pay once a day. The big ones only pay when a workspace merges green, once per workspace, and never for an empty change. Ticking off review items only counts when they’re real.</div></details>
-        <details><summary><span>Can I cheat by pasting code from another chatbot?</span><span class="plus">+</span></summary><div class="ans">Honestly, yes. haro can’t see outside your workspace, and it doesn’t try to. XP is a personal score on your own machine, so the only person you’d be fooling is you.</div></details>
-        <details><summary><span>What happens if I switch to Agent halfway?</span><span class="plus">+</span></summary><div class="ans">haro asks first and saves your work. The XP you already earned stays yours. The merge then pays agent rates, and that task won’t count toward your streak.</div></details>
-        <details><summary><span>Does it work on Windows?</span><span class="plus">+</span></summary><div class="ans">Not yet. Linux comes first.</div></details>
-        <details><summary><span>Is it free and open source?</span><span class="plus">+</span></summary><div class="ans">Yes. It’s MIT licensed, the source is on GitHub, and it all runs on your machine.</div></details>
+    <section id="agent" class="sec">
+      <div class="wrap two reveal">
+        <div>
+          <div class="eyebrow">07 · AGENT MODE</div>
+          <h2>Hand over the wheel when you just need it shipped.</h2>
+        </div>
+        <div class="copy">
+          <p>Switch the workspace to Agent and describe the task. The agent works in its own copy of your repo, several at a time if you like, and the same fence, gate and receipt apply. It can hand lookups and reviews to sub-agents on cheaper models you choose.</p>
+          <p>Every run keeps a restore point, so one button puts your files back to before it started. A short block-list refuses the worst shell commands, such as <code>git reset --hard</code> and reading your <code>.env</code>, and the receipt lists anything it refused. You can switch to Manual halfway: haro saves your part first, so the receipt shows you both.</p>
+        </div>
+      </div>
+      <figure class="shot-fig reveal d1">
+        <button type="button" class="shot" data-shot="7"><img src="shots/shot-agent.jpg" alt="The agent step after a run: the summary, the Restore files to before this run button and the Scope box." loading="lazy"></button>
+        <figcaption><span>agent step · a finished run, with its restore button</span></figcaption>
+      </figure>
+    </section>
+
+    <section id="dashboard" class="sec">
+      <div class="wrap two reveal">
+        <div>
+          <div class="eyebrow">08 · DASHBOARD</div>
+          <h2>See what needs you, at a glance.</h2>
+        </div>
+        <div class="copy">
+          <p>Every workspace across your projects in one list, sorted by what it needs: your review, still running, ready to ship, or done. Each row shows the next step. The line under the heading counts the changed lines waiting for you, and a review limit you set warns you when agent output is piling up faster than you can read it.</p>
+        </div>
+      </div>
+      <figure class="shot-fig reveal d1">
+        <button type="button" class="shot" data-shot="8"><img src="shots/shot-dashboard.jpg" alt="The dashboard: workspaces grouped by what they need, each with its next step." loading="lazy"></button>
+        <figcaption><span>dashboard</span><span>What needs you comes first.</span></figcaption>
+      </figure>
+    </section>
+
+    <section id="xp" class="sec">
+      <div class="wrap two reveal">
+        <div>
+          <div class="eyebrow">09 · XP</div>
+          <h2>A small pat on the back for doing it yourself.</h2>
+        </div>
+        <div class="copy">
+          <p>Levels, ranks from Novice to Master, a streak and a few badges. Work you wrote by hand pays more than work an agent touched, and a red run pays nothing. It is a light scoreboard, and you can switch it off in Settings.</p>
+        </div>
+      </div>
+      <div class="wrap two-fig">
+        <div class="card pad reveal" id="xp-card">
+          <div class="xp-top"><span class="lvl mono" id="xp-lvl">7</span><div class="grow"><div id="xp-rank">Journeyman</div><div class="dim mono tiny" id="xp-txt">1,240 / 2,000 XP</div></div></div>
+          <div class="thin"><div id="xp-bar"></div></div>
+          <div class="streak"><span class="dim mono tiny">STREAK 14d</span><span class="ticks" id="xp-ticks"></span></div>
+          <div class="rewards">
+            <div class="rw"><span>red to green, by hand</span><span class="mono">+120</span></div>
+            <div class="rw"><span>started from a failing test</span><span class="mono">+30</span></div>
+          </div>
+          <div class="ranks" id="xp-ranks"></div>
+        </div>
+        <figure class="reveal d1 span2">
+          <button type="button" class="shot" data-shot="9"><img src="shots/shot-xp.jpg" alt="The How XP works popover above the sidebar footer." loading="lazy"></button>
+          <figcaption><span>how XP works · sidebar footer</span></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="local" class="sec">
+      <div class="wrap two band reveal">
+        <div>
+          <div class="eyebrow">10 · LOCAL FIRST</div>
+          <h2 class="h-sm">Local first, Linux first.</h2>
+        </div>
+        <p class="copy">Everything runs on your machine, against your own repo. The agent uses your own Claude Code login, and pull requests go through your own <code>gh</code>. No GitHub app to install, no broad permissions to hand over. There is a guide built into the app, so you can look things up without leaving it.</p>
+      </div>
+    </section>
+
+    <section id="download" class="sec">
+      <div class="wrap two reveal">
+        <div>
+          <div class="eyebrow">11 · DOWNLOAD</div>
+          <h2>Download</h2>
+        </div>
+        <p class="copy">v0.11.0 for Linux x86_64. Build from source: <a class="ul" href="https://github.com/HaziqLucii/haro-oss">github.com/HaziqLucii/haro-oss</a></p>
+      </div>
+      <div class="wrap installs" id="installs"></div>
+    </section>
+
+    <section class="sec">
+      <div class="wrap status-grid">
+        <div class="reveal">
+          <div class="eyebrow">WHERE IT IS TODAY</div>
+          <div class="cols2">
+            <div>
+              <div class="eyebrow g">WORKS TODAY</div>
+              <ul class="list">
+                <li>Manual mode: plan, search, docs, editor, terminal</li>
+                <li>Agent or manual, per workspace</li>
+                <li>Scope fence for agent runs (opt-in)</li>
+                <li>Review overview, restore point, command block-list</li>
+                <li>Test gate and tamper alarm</li>
+                <li>Receipt with "written by", hand edits listed</li>
+                <li>XP, rank, streak, badges</li>
+                <li>Local merge and GitHub PRs via gh</li>
+              </ul>
+            </div>
+            <div>
+              <div class="eyebrow">NOT YET</div>
+              <ul class="list dimmed">
+                <li>Offline framework docsets (man pages work offline today)</li>
+                <li>Windows</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div id="faq" class="reveal d1">
+          <div class="eyebrow">FAQ</div>
+          <div class="faq" id="faq-list"></div>
+        </div>
       </div>
     </section>
   </main>
 
   <footer class="foot">
-    <a class="foot-logo" href="#top">haro.</a>
-    <div class="foot-links"><a href="https://github.com/HaziqLucii/haro-oss">GitHub</a><a href="#download">Download</a><span class="mit">MIT</span></div>
+    <div class="wrap foot-in">
+      <div class="foot-brand">
+        <span class="mark mark-foot" data-mark="1" aria-hidden="true"></span>
+        <div><div class="word big">haro.</div><div class="tag">You stay the author.</div></div>
+      </div>
+      <div class="foot-links"><a href="https://github.com/HaziqLucii/haro-oss">GitHub</a><a href="#download">Download</a><a href="#faq">FAQ</a><span class="mono tiny">MIT</span></div>
+    </div>
   </footer>
 
-  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
-
-  <div class="lvl" id="lvl" hidden>
-    <div class="lvl-panel" role="status">
-      <button type="button" class="lvl-x" id="lvlClose" title="Close" aria-label="Close">✕</button>
-      <div class="lvl-sys">[ SYSTEM ]</div>
-      <div class="lvl-title">LEVEL UP</div>
-      <div class="lvl-sub">Journeyman → Craftsman · red to green by hand +120</div>
-      <div class="lvl-hint">CLICK ANYWHERE OR PRESS ESC</div>
-    </div>
-  </div>
-
   <div class="lb" id="lb" hidden>
-    <div class="lb-panel" role="dialog" aria-modal="true" aria-label="Screenshot viewer">
-      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+    <div class="lb-win" role="dialog" aria-modal="true" aria-label="Screenshot">
       <div class="lb-head">
-        <span id="lbLabel"></span><span class="lb-line"></span>
-        <span class="lb-pos" id="lbPos"></span>
-        <button type="button" class="lb-x" id="lbClose" title="Close (Esc)" aria-label="Close">✕</button>
+        <span class="mono tiny lb-label" id="lb-label"></span>
+        <span class="mono tiny dim" id="lb-pos"></span>
+        <span class="grow"></span>
+        <button type="button" class="ib" id="lb-prev" title="Previous (left arrow)" aria-label="Previous">←</button>
+        <button type="button" class="ib" id="lb-next" title="Next (right arrow)" aria-label="Next">→</button>
+        <button type="button" class="ib" id="lb-close" title="Close (Esc)" aria-label="Close">✕</button>
       </div>
-      <div class="lb-stage">
-        <img id="lbImg" alt="">
-        <button type="button" class="lb-nav prev" id="lbPrev" title="Previous (←)" aria-label="Previous screenshot">←</button>
-        <button type="button" class="lb-nav next" id="lbNext" title="Next (→)" aria-label="Next screenshot">→</button>
-      </div>
-      <div class="lb-foot"><span id="lbAlt"></span><span class="lb-keys">← → · ESC</span></div>
+      <div class="lb-img"><img id="lb-img" alt=""></div>
+      <div class="lb-alt" id="lb-alt"></div>
     </div>
   </div>
 
+  <div class="toast" id="toast" hidden></div>
   <div class="grain" aria-hidden="true"></div>
 </div>
 <script src="script.js"></script>

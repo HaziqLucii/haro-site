@@ -1,340 +1,308 @@
 (function () {
   'use strict';
 
-  var RM = window.matchMedia('(prefers-reduced-motion: reduce)');
-  var reduced = function () { return RM.matches; };
-  var $ = function (id) { return document.getElementById(id); };
-  var timers = [];
-  function later(fn, ms) { var t = setTimeout(fn, ms); timers.push(t); return t; }
+  var REL = 'https://github.com/HaziqLucii/haro-oss/releases/download/v0.11.0/';
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function store(key, val) {
-    try {
-      if (val === undefined) return window.sessionStorage.getItem(key);
-      window.sessionStorage.setItem(key, val);
-    } catch (e) {}
-    return null;
-  }
-
-  var root = $('root');
-
-  /* ---------- scroll reveal + quest triggers ---------- */
-  var reveals = Array.prototype.slice.call(document.querySelectorAll('[data-reveal]'));
-  var quests = Array.prototype.slice.call(document.querySelectorAll('[data-quest]'));
-  var pending = reveals.slice();
-  var fired = {};
-  var raf = 0;
-
-  function fire(el) {
-    var q = el.dataset.quest;
-    if (fired[q]) return;
-    fired[q] = true;
-    if (q === 'XP') xpSeen();
-    if (el.dataset.levelup) levelUp(); else toast('QUEST DISCOVERED', q);
-    if (q === 'The gate') gateDemo();
-  }
-
-  function check() {
-    raf = 0;
-    var vh = window.innerHeight || 800;
-    pending = pending.filter(function (el) {
-      var r = el.getBoundingClientRect();
-      if (r.top < vh * 0.9 && r.bottom > 0) { el.classList.add('in'); return false; }
-      return true;
-    });
-    quests.forEach(function (el) {
-      var r = el.getBoundingClientRect();
-      if (r.top < vh * 0.6 && r.bottom > vh * 0.2) fire(el);
-    });
-  }
-  function onScroll() { if (!raf) raf = requestAnimationFrame(check); }
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll);
-  requestAnimationFrame(check);
-  later(function () { pending.forEach(function (el) { el.classList.add('in'); }); pending = []; }, 2500);
-
-  /* ---------- toasts ---------- */
-  var toastBox = $('toasts');
-  var tid = 0;
-  function toast(k, t) {
-    var id = ++tid;
-    toastBox.textContent = '';
-    var el = document.createElement('div');
-    el.className = 'toast';
-    var a = document.createElement('div'); a.className = 'tk'; a.textContent = '[ SYSTEM ] ' + k;
-    var b = document.createElement('div'); b.className = 'tt'; b.textContent = t;
-    el.appendChild(a); el.appendChild(b);
-    toastBox.appendChild(el);
-    later(function () { if (id === tid) el.classList.add('on'); }, 30);
-    later(function () { if (id === tid) el.classList.remove('on'); }, 2600);
-    later(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 3100);
-  }
-
-  /* ---------- level up ---------- */
-  var lvl = $('lvl'), lvlOpen = false, lvlTimer = 0, lvlHide = 0;
-  function levelUp() {
-    if (reduced() || store('haroLvl')) { toast('QUEST DISCOVERED', 'XP'); return; }
-    store('haroLvl', '1');
-    lvlOpen = true;
-    lvl.hidden = false;
-    lvl.classList.remove('on');
-    later(function () { lvl.classList.add('on'); }, 30);
-    lvlTimer = later(closeLvl, 3200);
-  }
-  function closeLvl() {
-    if (!lvlOpen) return;
-    lvlOpen = false;
-    lvl.classList.remove('on');
-    clearTimeout(lvlTimer);
-    if (lvl.contains(document.activeElement)) document.activeElement.blur();
-    lvlHide = setTimeout(function () { if (!lvlOpen) lvl.hidden = true; }, 500);
-  }
-  lvl.addEventListener('click', closeLvl);
-
-  /* ---------- xp section state ---------- */
-  function xpSeen() {
-    var cells = document.querySelectorAll('#ranks .rank-cell');
-    cells[2].classList.add('lit', 'cur');
-    $('rewards').classList.add('on');
-  }
-
-  /* ---------- gate clearing ---------- */
-  var cellsBox = $('gateCells'), gi = 0, gateCells = [];
-  for (var c = 0; c < 72; c++) { var s = document.createElement('span'); cellsBox.appendChild(s); gateCells.push(s); }
-  function renderGate(n) {
-    for (var i = 0; i < 72; i++) {
-      gateCells[i].style.background = i < n ? 'rgba(65,209,131,.8)' : (i === n ? '#d8d0c5' : '');
-    }
-    var key = $('gateKey');
-    key.textContent = n >= 72 ? 'GREEN' : n ? 'RUNNING' : 'WAITING';
-    key.classList.toggle('done', n >= 72);
-    $('gateCount').textContent = Math.min(18, Math.round(n / 4)) + ' / 18 passed';
-    $('gateMut').textContent = n >= 72 ? '100%' : '…';
-  }
-  renderGate(0);
-  function gateDemo() {
-    clearInterval(gi);
-    if (reduced()) { renderGate(72); return; }
-    var n = 0;
-    renderGate(0);
-    gi = setInterval(function () {
-      n++;
-      if (n >= 72) clearInterval(gi);
-      renderGate(n);
-    }, 45);
-  }
-
-  /* ---------- hero system window ---------- */
-  var LINES = [
-    ['> You have been chosen as a Developer.', '', 0],
-    ['Daily quest', 'ship one change on green', 0],
-    ['Tests', '18 / 18', 1],
-    ['Tamper alarm', 'clean', 0],
-    ['Reward', '+120 XP', 2]
+  // Glyph units: x 0..56, y 0..51. kind: d dots, c cells, g gate, b bar.
+  var MARK = [
+    [0, 0, 6, 6, 'd', 0], [12, 0, 6, 6, 'd', 1], [24, 0, 6, 6, 'd', 2], [36, 0, 6, 6, 'd', 3], [48, 0, 6, 6, 'd', 4],
+    [0, 16, 9, 9, 'c', 0], [18, 16, 9, 9, 'c', 1], [36, 16, 9, 9, 'c', 2],
+    [9, 25, 9, 9, 'c', 3], [27, 25, 9, 9, 'c', 4], [45, 25, 9, 9, 'c', 5],
+    [0, 40, 11, 11, 'g', 0], [14, 40, 42, 11, 'b', 0]
   ];
-  var sw = { line: 0, chars: 0, hold: false, xp: false };
-  var sysLines = $('sysLines');
-  var lineEls = [];
-  function renderSys() {
-    var shown = LINES.slice(0, sw.line + 1);
-    while (lineEls.length < shown.length) {
-      var d = document.createElement('div'); d.className = 'sw-line';
-      var a = document.createElement('span'), b = document.createElement('span');
-      d.appendChild(a); d.appendChild(b);
-      sysLines.appendChild(d);
-      lineEls.push({ d: d, a: a, b: b });
-    }
-    while (lineEls.length > shown.length) { sysLines.removeChild(lineEls.pop().d); }
-    shown.forEach(function (l, i) {
-      var full = l[0] + (l[1] ? '  ' + l[1] : '');
-      var n = i < sw.line ? full.length : sw.chars;
-      var e = lineEls[i];
-      e.d.style.color = i === 0 ? '#d8d0c5' : 'rgba(216,208,197,.62)';
-      e.b.style.color = l[2] === 1 ? '#41d183' : l[2] === 2 ? '#6fb2ff' : '#d8d0c5';
-      e.a.textContent = l[0].slice(0, n);
-      e.b.textContent = n > l[0].length + 2 ? l[1].slice(0, n - l[0].length - 2) : '';
-    });
-    $('sysLv').textContent = sw.xp ? 'LV. 8' : 'LV. 7';
-    $('sysXp').style.width = sw.xp ? '100%' : '62%';
-    $('sysRank').textContent = sw.xp ? 'RANK  Novice → Journeyman' : 'RANK  Novice';
-    $('sysAccept').classList.toggle('on', sw.hold);
-  }
-  function typeStep() {
-    if (sw.hold) return;
-    var cur = LINES[sw.line];
-    var full = cur[0] + (cur[1] ? '  ' + cur[1] : '');
-    if (sw.chars < full.length) sw.chars++;
-    else if (sw.line < LINES.length - 1) { sw.line++; sw.chars = 0; }
-    else {
-      sw.hold = true;
-      later(function () { sw.xp = true; renderSys(); }, 200);
-      later(function () { sw.line = 0; sw.chars = 0; sw.hold = false; sw.xp = false; renderSys(); }, 7000);
-    }
-    renderSys();
-  }
-  var typeTimer = 0;
-  function startTyping() {
-    clearInterval(typeTimer);
-    if (reduced()) {
-      sw.line = LINES.length - 1; sw.chars = 999; sw.hold = true; sw.xp = true;
-      renderSys();
-      return;
-    }
-    sw = { line: 0, chars: 0, hold: false, xp: false };
-    renderSys();
-    typeTimer = setInterval(typeStep, 38);
-  }
-  startTyping();
+  var NEED = { d: 0, c: 1, g: 2, b: 3 };
 
-  /* ---------- particles ---------- */
-  (function () {
-    var cv = $('particles');
-    var ctx = cv.getContext && cv.getContext('2d');
-    if (!ctx) return;
-    var W = 0, H = 0, dpr = window.devicePixelRatio || 1, running = false, visible = true, id = 0;
-    function rs() {
-      var r = cv.getBoundingClientRect();
-      W = cv.width = Math.max(1, r.width * dpr);
-      H = cv.height = Math.max(1, r.height * dpr);
-      if (reduced()) draw(0);
+  var SHOTS = [
+    ['MANUAL WORKSPACE', 'shot-manual', 'A manual workspace on the code step, with the plan checklist in the rail.'],
+    ['SEARCH', 'shot-search', 'The Search tab: a short answer with its sources, grouped by repo, git and docs.'],
+    ['THE SCOPE BOX', 'shot-fence', 'The agent step with a task typed in and the Scope box holding two files.'],
+    ['REVIEW OVERVIEW', 'shot-review', 'The review Overview: intent, fence, size with the reading pace, and the list of things that need your review.'],
+    ['SHIP', 'shot-ship', 'The ship step with the receipt and the merge panel.'],
+    ['REVIEW · GREEN', 'shot-verify', 'The review step with a green verdict and the start of the Overview.'],
+    ['REVIEW · RED', 'shot-red', 'The review step with a red verdict: the tamper alarm reports a weakened suite and the merge is blocked.'],
+    ['AGENT STEP', 'shot-agent', 'The agent step after a run: the summary, the Restore files to before this run button and the Scope box.'],
+    ['DASHBOARD', 'shot-dashboard', 'The dashboard: workspaces grouped by what they need, each with its next step.'],
+    ['HOW XP WORKS', 'shot-xp', 'The How XP works popover above the sidebar footer.']
+  ];
+
+  var INSTALLS = [
+    ['AppImage', 'curl -LO ' + REL + 'haro-0.11.0-x86_64.AppImage && chmod +x haro-0.11.0-x86_64.AppImage && ./haro-0.11.0-x86_64.AppImage', REL + 'haro-0.11.0-x86_64.AppImage'],
+    ['Tarball', 'curl -L ' + REL + 'haro-0.11.0-linux-x86_64.tar.gz | tar xz && ./haro-0.11.0-linux-x86_64/install.sh', REL + 'haro-0.11.0-linux-x86_64.tar.gz']
+  ];
+
+  var FAQ = [
+    ['Is this anti-AI?', 'No. haro is against unchecked code, not against AI. Agent mode is right there, behind the same gate. Use it when you want the work done for you, and Manual mode when you want to write it yourself.'],
+    ['Can the AI write code in Manual mode?', 'No. It cannot edit files or run commands, and haro compares your files before and after every answer. If an answer includes code, haro strips it out.'],
+    ['How does the scope fence work?', 'Before an agent run starts, haro remembers your worktree. When the run ends it puts back anything the agent changed outside the files you named, and keeps what it wrote there under a git ref. It checks the result, not the agent’s tools, because an agent with a shell can write anywhere. The fence is opt-in: leave Scope empty and the agent can edit anything.'],
+    ['Can the receipt prove no AI wrote my code?', 'No. It describes what happened inside haro: what the agent and the assistant did, and which files you edited yourself. It cannot see a chat window open next to it, and it does not try to.'],
+    ['Can the agent still do damage with a shell command?', 'The fence is about files, so it does not stop a command from using the network. A short block-list refuses the worst commands (a hard reset, a force push, reading .env files) and lists them on the receipt, but it is a quick check on the text, not a guarantee. That is why every run keeps a restore point: one button puts your files back to before it started.'],
+    ['What stops me farming XP?', 'Small daily rewards pay once a day. The big ones only pay when a workspace merges green, once per workspace, and never for an empty change. And it is a personal score on your own machine, so the only person you would be fooling is you.'],
+    ['What happens if I switch to Agent halfway?', 'haro asks first and saves your work. The XP you already earned stays yours. The merge then pays agent rates, and that task will not count toward your streak.'],
+    ['Does it work on Windows?', 'Not yet. Linux comes first.'],
+    ['Is it free and open source?', 'Yes. It is MIT licensed, the source is on GitHub, and it all runs on your machine.']
+  ];
+
+  var MODES = {
+    manual: {
+      line: 'You write every line. Three steps.',
+      steps: [
+        ['code', 'You write it. The assistant only plans and points you to sources.'],
+        ['review', 'Your tests run. You read the overview, then the files.'],
+        ['ship', 'Merge on green. The receipt says who wrote it.']
+      ]
+    },
+    agent: {
+      line: 'The agent writes, you review. Four steps.',
+      steps: [
+        ['agent', 'Describe the task and fence it to the files you name.'],
+        ['code', 'Read the diff. Lines the tests ran are marked.'],
+        ['review', 'The overview first, then the tests. You decide.'],
+        ['ship', 'Merge on green, with a receipt.']
+      ]
     }
-    var P = [];
-    for (var i = 0; i < 70; i++) P.push({ x: Math.random(), y: Math.random(), s: Math.random() * 1.8 + 0.6, v: Math.random() * 0.0009 + 0.0003, f: Math.random() * 6 });
-    function draw(t) {
-      ctx.clearRect(0, 0, W, H);
-      var motion = !reduced();
-      P.forEach(function (p) {
-        if (motion) { p.y -= p.v; if (p.y < -0.02) { p.y = 1.02; p.x = Math.random(); } }
-        var a = 0.25 + 0.35 * Math.sin(t / 700 + p.f);
-        ctx.fillStyle = 'rgba(111,178,255,' + Math.max(0, a) + ')';
-        var s = p.s * dpr;
-        ctx.fillRect(p.x * W, p.y * H, s, s);
+  };
+
+  function $(s, r) { return (r || document).querySelector(s); }
+  function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function drawMark(host) {
+    MARK.forEach(function (p) {
+      var i = document.createElement('i');
+      i.style.left = (p[0] / 56 * 100) + '%';
+      i.style.top = (p[1] / 51 * 100) + '%';
+      i.style.width = (p[2] / 56 * 100) + '%';
+      i.style.height = (p[3] / 51 * 100) + '%';
+      if (p[4] === 'g') i.className = 'g';
+      i.dataset.kind = p[4];
+      host.appendChild(i);
+    });
+  }
+  $$('[data-mark]').forEach(drawMark);
+
+  var heroMark = $('.mark-hero');
+  var labels = $$('.ml');
+  var phase = 4;
+
+  function paintHero(p) {
+    $$('i', heroMark).forEach(function (i) {
+      i.style.opacity = p >= NEED[i.dataset.kind] ? 1 : 0.12;
+    });
+    labels.forEach(function (l) { l.classList.toggle('on', p >= +l.dataset.need); });
+    $('#ml-gate').textContent = p >= 3 ? '3 · GATE · GREEN → 4 · MERGED' : '3 · GATE · GREEN';
+  }
+
+  var modeKey = 'manual', stepOn = 0, ticks = 0;
+  var stepsHost = $('#steps');
+
+  function paintSteps() {
+    var m = MODES[modeKey];
+    stepsHost.innerHTML = '';
+    stepsHost.style.setProperty('--n', m.steps.length);
+    m.steps.forEach(function (s, k) {
+      var d = el('div', 'step' + (k === stepOn ? ' on' : '') + (s[0] === 'review' ? ' v' : ''));
+      var h = el('div', 'step-h');
+      h.appendChild(el('span', 'step-n', '0' + (k + 1)));
+      h.appendChild(el('span', 'step-dot'));
+      h.appendChild(el('span', 'step-name', s[0]));
+      d.appendChild(h);
+      d.appendChild(el('div', 'step-d', s[1]));
+      stepsHost.appendChild(d);
+    });
+    $('#mode-line').textContent = m.line;
+    $$('.seg button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.mode === modeKey)); });
+  }
+  $$('.seg button').forEach(function (b) {
+    b.addEventListener('click', function () { modeKey = b.dataset.mode; stepOn = 0; paintSteps(); });
+  });
+
+  if (reduce) {
+    paintHero(4);
+    paintSteps();
+  } else {
+    paintHero(0);
+    paintSteps();
+    setInterval(function () {
+      ticks += 1;
+      phase = Math.min(ticks % 6, 4);
+      paintHero(phase);
+      if (phase === 0 || ticks % 6 === 0) {
+        stepOn = (stepOn + 1) % MODES[modeKey].steps.length;
+        paintSteps();
+      }
+    }, 900);
+  }
+
+  // reveal on scroll
+  var reveals = $$('.reveal');
+  function showAll() { reveals.forEach(function (e) { e.classList.add('in'); }); }
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('in');
+        io.unobserve(e.target);
       });
-    }
-    function loop(t) { draw(t); id = requestAnimationFrame(loop); }
-    function sync() {
-      var want = visible && !document.hidden && !reduced();
-      if (want && !running) { running = true; id = requestAnimationFrame(loop); }
-      else if (!want && running) { running = false; cancelAnimationFrame(id); }
-    }
-    rs();
-    window.addEventListener('resize', rs);
-    document.addEventListener('visibilitychange', sync);
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (en) { visible = en[0].isIntersecting; sync(); }).observe(cv);
-    }
-    if (RM.addEventListener) RM.addEventListener('change', function () { sync(); rs(); });
-    sync();
-    if (reduced()) draw(0);
-  })();
+    }, { threshold: 0.12 });
+    reveals.forEach(function (e) { io.observe(e); });
+    setTimeout(showAll, 4000);
+  } else {
+    showAll();
+  }
 
-  /* ---------- copy buttons ---------- */
-  function copyText(text) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(text).catch(function () { fallbackCopy(text); });
-    }
-    fallbackCopy(text);
-    return Promise.resolve();
+  // nav highlight
+  var links = $$('#nav-links a');
+  var secs = links.map(function (a) { return $(a.getAttribute('href')); }).filter(Boolean);
+  if ('IntersectionObserver' in window) {
+    var so = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        links.forEach(function (a) { a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id); });
+      });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    secs.forEach(function (s) { so.observe(s); });
   }
-  function fallbackCopy(text) {
-    try {
-      var ta = document.createElement('textarea');
-      ta.value = text; ta.setAttribute('readonly', '');
-      ta.style.cssText = 'position:fixed;left:-9999px;top:0';
-      document.body.appendChild(ta); ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-    } catch (e) {}
+
+  // gate demo
+  var gate = $('#gate-demo'), gN = 0, gTimer = null, gRan = false;
+  function paintGate(done, run) {
+    gate.dataset.state = done ? 'done' : run ? 'run' : 'idle';
+    $('#g-key').textContent = done ? 'GREEN' : run ? 'RUNNING' : 'NOT RUN';
+    $('#g-when').textContent = done ? 'illustration · 3.2s' : run ? 'illustration · running…' : 'illustration · waiting';
+    $('#g-head').textContent = done ? 'All 18 tests pass' : run ? gN + ' of 18 tests done' : 'Scroll here to run it';
+    $('#g-bar').style.width = Math.round(gN / 18 * 100) + '%';
+    $('#g-tests').textContent = gN + ' / 18';
+    $('#g-cov').textContent = done ? '91.2%' : '…';
+    $('#g-merge').textContent = done ? 'open' : 'blocked';
   }
-  Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'), function (btn) {
-    btn.addEventListener('click', function () {
-      var cmd = btn.closest('.cmd').querySelector('[data-cmd]').textContent;
-      copyText(cmd);
-      btn.textContent = 'COPIED';
-      later(function () { btn.textContent = 'COPY'; }, 1400);
-      toast('COPIED', 'Paste it into your terminal.');
+  function runGate() {
+    clearInterval(gTimer);
+    gN = 0;
+    if (reduce) { gN = 18; paintGate(true, false); return; }
+    paintGate(false, true);
+    gTimer = setInterval(function () {
+      gN += 1;
+      if (gN >= 18) { clearInterval(gTimer); gN = 18; paintGate(true, false); } else paintGate(false, true);
+    }, 110);
+  }
+  $('#g-rerun').addEventListener('click', runGate);
+
+  // xp
+  var xpCard = $('#xp-card'), xpOn = false;
+  var RANKS = ['NOVICE', 'JOURNEYMAN', 'CRAFTSMAN', 'MASTER'];
+  var rankHost = $('#xp-ranks');
+  RANKS.forEach(function (r) { rankHost.appendChild(el('span', '', r)); });
+  var tickHost = $('#xp-ticks');
+  for (var k = 0; k < 14; k++) tickHost.appendChild(el('i', k === 3 || k === 8 ? 'o' : ''));
+  function paintXp(on) {
+    xpCard.classList.toggle('xp-on', on);
+    $('#xp-lvl').textContent = on ? 8 : 7;
+    $('#xp-rank').textContent = on ? 'Craftsman' : 'Journeyman';
+    $('#xp-txt').textContent = on ? '2,120 / 4,000 XP' : '1,240 / 2,000 XP';
+    $('#xp-bar').style.width = on ? '6%' : '62%';
+    $$('span', rankHost).forEach(function (s, i) { s.classList.toggle('lit', i <= (on ? 2 : 1)); });
+  }
+  paintXp(false);
+
+  function inView(e) {
+    var r = e.getBoundingClientRect();
+    return r.top < innerHeight * 0.85 && r.bottom > 0;
+  }
+  function demos() {
+    if (!gRan && inView(gate)) { gRan = true; runGate(); }
+    if (!xpOn && inView(xpCard)) { xpOn = true; paintXp(true); }
+  }
+  window.addEventListener('scroll', demos, { passive: true });
+  setInterval(demos, 500);
+  demos();
+
+  // downloads
+  var toast = $('#toast'), toastT = null;
+  function say(msg) {
+    toast.textContent = msg;
+    toast.hidden = false;
+    clearTimeout(toastT);
+    toastT = setTimeout(function () { toast.hidden = true; }, 1600);
+  }
+  INSTALLS.forEach(function (it) {
+    var box = el('div', 'inst');
+    var h = el('div', 'inst-h');
+    h.appendChild(el('h3', '', it[0]));
+    var a = el('a', '', 'Download the file');
+    a.href = it[2];
+    h.appendChild(a);
+    box.appendChild(h);
+    var cmd = el('div', 'cmd');
+    var sp = el('span');
+    sp.appendChild(el('span', 'p', '$ '));
+    sp.appendChild(document.createTextNode(it[1]));
+    cmd.appendChild(sp);
+    var b = el('button', '', 'COPY');
+    b.type = 'button';
+    b.addEventListener('click', function () {
+      try { navigator.clipboard.writeText(it[1]); } catch (e) { /* the command stays selectable */ }
+      b.textContent = 'COPIED';
+      say('Copied. Paste it into your terminal.');
+      setTimeout(function () { b.textContent = 'COPY'; }, 1600);
     });
+    cmd.appendChild(b);
+    box.appendChild(cmd);
+    $('#installs').appendChild(box);
   });
 
-  /* ---------- lightbox ---------- */
-  var lb = $('lb'), lbImg = $('lbImg'), lbIdx = null, lbFrom = null, lbHide = 0;
-  var shots = Array.prototype.map.call(document.querySelectorAll('figure a img'), function (img) {
-    var fig = img.closest('figure');
-    var lab = fig && fig.firstElementChild;
-    return {
-      src: img.getAttribute('src'),
-      alt: img.getAttribute('alt') || '',
-      label: lab ? lab.textContent.replace(/\s+/g, ' ').replace(/\[|\]/g, '').trim() : '',
-      link: img.closest('a')
-    };
+  // faq
+  FAQ.forEach(function (f) {
+    var d = el('details');
+    var s = el('summary');
+    s.appendChild(el('span', '', f[0]));
+    s.appendChild(el('i', '', '+'));
+    d.appendChild(s);
+    d.appendChild(el('div', 'ans', f[1]));
+    $('#faq-list').appendChild(d);
   });
-  function lbRender() {
-    var s = shots[lbIdx];
-    lbImg.classList.remove('on');
-    lbImg.src = s.src;
-    lbImg.alt = s.alt;
-    $('lbLabel').textContent = s.label;
-    $('lbAlt').textContent = s.alt;
-    $('lbPos').textContent = String(lbIdx + 1).padStart(2, '0') + ' / ' + String(shots.length).padStart(2, '0');
+
+  // lightbox
+  var lb = $('#lb'), lbI = null;
+  function lbPaint() {
+    var s = SHOTS[lbI];
+    $('#lb-label').textContent = s[0];
+    $('#lb-pos').textContent = String(lbI + 1).padStart(2, '0') + ' / ' + String(SHOTS.length).padStart(2, '0');
+    var img = $('#lb-img');
+    img.style.opacity = 0;
+    img.onload = function () { img.style.opacity = 1; };
+    img.src = 'shots/' + s[1] + '.jpg';
+    img.alt = s[2];
+    $('#lb-alt').textContent = s[2];
   }
-  function lbOpen(i, from) {
-    clearTimeout(lbHide);
-    lbIdx = i;
-    lbFrom = from || document.activeElement;
+  function lbOpen(i) {
+    lbI = i;
     lb.hidden = false;
-    lb.classList.remove('on');
-    lbRender();
+    lbPaint();
     document.body.style.overflow = 'hidden';
-    later(function () { lb.classList.add('on'); }, 20);
-    later(function () { lbImg.classList.add('on'); }, 120);
-    $('lbClose').focus();
+    requestAnimationFrame(function () { lb.classList.add('show'); });
   }
   function lbClose() {
-    if (lbIdx === null) return;
-    lbIdx = null;
-    lb.classList.remove('on');
+    lb.classList.remove('show');
     document.body.style.overflow = '';
-    lbHide = setTimeout(function () { if (lbIdx === null) lb.hidden = true; }, 350);
-    if (lbFrom && lbFrom.focus) lbFrom.focus({ preventScroll: true });
-    lbFrom = null;
+    setTimeout(function () { lb.hidden = true; lbI = null; }, 250);
   }
-  function lbGo(d) {
-    if (lbIdx === null) return;
-    var n = shots.length;
-    lbIdx = (lbIdx + d + n) % n;
-    lbRender();
-    later(function () { lbImg.classList.add('on'); }, 60);
-  }
-  root.addEventListener('click', function (e) {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
-    var a = e.target.closest && e.target.closest('figure a');
-    if (!a || !a.querySelector('img')) return;
-    e.preventDefault();
-    var src = a.querySelector('img').getAttribute('src');
-    var i = shots.findIndex(function (s) { return s.src === src; });
-    lbOpen(i < 0 ? 0 : i, a);
-  });
+  function lbGo(d) { lbI = (lbI + d + SHOTS.length) % SHOTS.length; lbPaint(); }
+  $$('.shot').forEach(function (b) { b.addEventListener('click', function () { lbOpen(+b.dataset.shot); }); });
   lb.addEventListener('click', lbClose);
-  $('lbClose').addEventListener('click', lbClose);
-  $('lbPrev').addEventListener('click', function (e) { e.stopPropagation(); lbGo(-1); });
-  $('lbNext').addEventListener('click', function (e) { e.stopPropagation(); lbGo(1); });
-  $('lbClose').addEventListener('click', function (e) { e.stopPropagation(); });
-  document.querySelector('.lb-panel').addEventListener('click', function (e) { e.stopPropagation(); });
-
+  $('.lb-win').addEventListener('click', function (e) { e.stopPropagation(); });
+  $('#lb-close').addEventListener('click', lbClose);
+  $('#lb-prev').addEventListener('click', function () { lbGo(-1); });
+  $('#lb-next').addEventListener('click', function () { lbGo(1); });
   window.addEventListener('keydown', function (e) {
-    if (lbIdx !== null) {
-      if (e.key === 'Escape') { e.preventDefault(); lbClose(); }
-      else if (e.key === 'ArrowRight') { e.preventDefault(); lbGo(1); }
-      else if (e.key === 'ArrowLeft') { e.preventDefault(); lbGo(-1); }
-      else if (e.key === 'Tab') {
-        var f = [$('lbClose'), $('lbPrev'), $('lbNext')];
-        var i = f.indexOf(document.activeElement);
-        e.preventDefault();
-        f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
-      }
-      return;
-    }
-    if (e.key === 'Escape') closeLvl();
+    if (lbI === null) return;
+    if (e.key === 'Escape') lbClose();
+    else if (e.key === 'ArrowRight') lbGo(1);
+    else if (e.key === 'ArrowLeft') lbGo(-1);
   });
-
-  if (RM.addEventListener) RM.addEventListener('change', function () { startTyping(); });
 })();

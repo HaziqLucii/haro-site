@@ -7,4 +7,4 @@ One static page that works on phones and desktops: `index.html`, `styles.css` an
 the brand fonts in `fonts/` and the screenshots in `shots/` (taken from the haro desktop app in its
 capture mode). No build step and no runtime. `m.html` only redirects old links to the page.
 
-The source of this page lives in the haro repo under `app/design/landing/site-v3/` (the "Arise" design).
+The source of this page lives in the haro repo under `app/design/landing/site-v4/` (the "Gate" design).

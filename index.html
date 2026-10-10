@@ -65,17 +65,22 @@
       </div>
     </div>
 
-    <div class="wrap reveal">
-      <div class="modebox">
-        <div class="mode-head">
-          <span class="label">WHO WRITES THE CODE</span>
-          <div class="seg" role="group" aria-label="Who writes the code">
-            <button type="button" data-mode="agent" aria-pressed="false">AGENT</button>
-            <button type="button" data-mode="manual" aria-pressed="true">MANUAL</button>
-          </div>
-          <span class="mode-line" id="mode-line">You write every line. Three steps.</span>
-        </div>
-        <div class="steps" id="steps"></div>
+    <div class="wrap reveal flows">
+      <div class="flows-head">
+        <span class="label">WHO WRITES THE CODE</span>
+        <span class="dim">Pick per workspace. Both end at the same gate.</span>
+      </div>
+      <div class="flows-grid">
+        <figure class="flow" id="flow-agent">
+          <div class="flow-head"><span class="tag">AGENT</span><span class="flow-title">The agent writes, you review</span><span class="grow"></span><span class="mono tiny dim">fig. 1 · 5 nodes</span></div>
+          <div class="fscroll"><svg class="fsvg" viewBox="0 0 600 300" role="img" aria-label="Agent flow: you describe the task and name the files, the agent edits in its own worktree, you review, your tests decide, then it merges with a receipt. Red tests send it back to the agent."></svg></div>
+          <div class="flow-foot"><span>── flow   ┄┄ loop on red</span><span class="flow-state" data-state></span></div>
+        </figure>
+        <figure class="flow" id="flow-manual">
+          <div class="flow-head"><span class="tag">MANUAL</span><span class="flow-title">You write, AI only plans</span><span class="grow"></span><span class="mono tiny dim">fig. 2 · 5 nodes</span></div>
+          <div class="fscroll"><svg class="fsvg" viewBox="0 0 600 300" role="img" aria-label="Manual flow: you ask for a plan, the assistant answers with a plan and pointers and makes no edits, you write the code by hand, your tests decide, then it merges with a receipt. Red tests send it back to you."></svg></div>
+          <div class="flow-foot"><span>┄ box = read-only, cannot edit</span><span class="flow-state" data-state></span></div>
+        </figure>
       </div>
     </div>
   </header>

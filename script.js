@@ -43,26 +43,6 @@
     ['Is it free and open source?', 'Yes. It is MIT licensed, the source is on GitHub, and it all runs on your machine.']
   ];
 
-  var MODES = {
-    manual: {
-      line: 'You write every line. Three steps.',
-      steps: [
-        ['code', 'You write it. The assistant only plans and points you to sources.'],
-        ['review', 'Your tests run. You read the overview, then the files.'],
-        ['ship', 'Merge on green. The receipt says who wrote it.']
-      ]
-    },
-    agent: {
-      line: 'The agent writes, you review. Four steps.',
-      steps: [
-        ['agent', 'Describe the task and fence it to the files you name.'],
-        ['code', 'Read the diff. Lines the tests ran are marked.'],
-        ['review', 'The overview first, then the tests. You decide.'],
-        ['ship', 'Merge on green, with a receipt.']
-      ]
-    }
-  };
-
   function $(s, r) { return (r || document).querySelector(s); }
   function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
   function el(tag, cls, text) {
@@ -98,45 +78,166 @@
     $('#ml-gate').textContent = p >= 3 ? '3 · GATE · GREEN → 4 · MERGED' : '3 · GATE · GREEN';
   }
 
-  var modeKey = 'manual', stepOn = 0, ticks = 0;
-  var stepsHost = $('#steps');
-
-  function paintSteps() {
-    var m = MODES[modeKey];
-    stepsHost.innerHTML = '';
-    stepsHost.style.setProperty('--n', m.steps.length);
-    m.steps.forEach(function (s, k) {
-      var d = el('div', 'step' + (k === stepOn ? ' on' : '') + (s[0] === 'review' ? ' v' : ''));
-      var h = el('div', 'step-h');
-      h.appendChild(el('span', 'step-n', '0' + (k + 1)));
-      h.appendChild(el('span', 'step-dot'));
-      h.appendChild(el('span', 'step-name', s[0]));
-      d.appendChild(h);
-      d.appendChild(el('div', 'step-d', s[1]));
-      stepsHost.appendChild(d);
-    });
-    $('#mode-line').textContent = m.line;
-    $$('.seg button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.mode === modeKey)); });
-  }
-  $$('.seg button').forEach(function (b) {
-    b.addEventListener('click', function () { modeKey = b.dataset.mode; stepOn = 0; paintSteps(); });
-  });
-
+  var ticks = 0;
   if (reduce) {
     paintHero(4);
-    paintSteps();
   } else {
     paintHero(0);
-    paintSteps();
     setInterval(function () {
       ticks += 1;
       phase = Math.min(ticks % 6, 4);
       paintHero(phase);
-      if (phase === 0 || ticks % 6 === 0) {
-        stepOn = (stepOn + 1) % MODES[modeKey].steps.length;
-        paintSteps();
-      }
     }, 900);
+  }
+
+  // The two flow diagrams. Node 0..4 sit at fixed spots; the dot rides one edge per tick
+  // (script rows are [node on, edge the dot rides, red?]); red sends it back along the loop.
+  var NODES = [[89, 58, 92, 44], [194, 138, 92, 44], [299, 58, 92, 44], null, [504, 58, 92, 44]];
+  var EDGES = ['M135 102 V160 H194', 'M286 160 H345 V102', 'M391 80 H450 V206', 'M508 240 H550 V102'];
+  var FLOWS = {
+    agent: {
+      lanes: ['YOU', 'AGENT', 'TESTS'],
+      edgeLabels: [[165, 152, 'run'], [318, 152, 'diff'], [470, 150, 'review'], [520, 232, 'yes']],
+      loop: ['M450 274 V288 H240 V182', 345, 295, 'no \u00b7 red \u2192 agent fixes'],
+      nodes: [['Task + scope', 'you name files'], ['Edit worktree', 'fenced to scope'], ['Review', 'mark files viewed'], ['Tests green?', 'your suite'], ['Merge', '+ receipt']],
+      back: 'AGENT',
+      script: [[0, 0], [1, 1], [2, 2], [3, 'L', 1], [1, 1], [2, 2], [3, 3], [4], [4], [4]]
+    },
+    manual: {
+      lanes: ['YOU', 'AI \u00b7 READ', 'TESTS'],
+      edgeLabels: [[165, 152, 'ask'], [318, 152, 'points'], [470, 150, 'tests'], [520, 232, 'yes']],
+      loop: ['M450 274 V288 H312 V102', 380, 295, 'no \u00b7 red \u2192 you fix it'],
+      nodes: [['Ask a plan', 'what to build'], ['Plan + refs', '0 edits'], ['Write code', 'by hand'], ['Tests green?', 'your suite'], ['Merge', '+ receipt']],
+      back: 'YOU',
+      script: [[0, 0], [1, 1], [2, 2], [3, 'L', 1], [2, 2], [3, 3], [4], [4], [4], [4]]
+    }
+  };
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  function sv(tag, attrs, text) {
+    var n = document.createElementNS(SVGNS, tag);
+    Object.keys(attrs || {}).forEach(function (k) { n.setAttribute(k, attrs[k]); });
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function parsePath(d) {
+    var pts = [], x = 0, y = 0;
+    d.match(/[MVH][^MVH]+/g).forEach(function (t) {
+      var c = t[0], v = t.slice(1).trim().split(/\s+/).map(Number);
+      if (c === 'M') { x = v[0]; y = v[1]; } else if (c === 'V') y = v[0]; else x = v[0];
+      pts.push([x, y]);
+    });
+    var seg = [], L = 0;
+    for (var i = 1; i < pts.length; i++) {
+      var l = Math.abs(pts[i][0] - pts[i - 1][0]) + Math.abs(pts[i][1] - pts[i - 1][1]);
+      seg.push(l); L += l;
+    }
+    return { pts: pts, seg: seg, L: L };
+  }
+  function pointAt(e, p) {
+    var d = e.L * p;
+    for (var i = 0; i < e.seg.length; i++) {
+      if (d <= e.seg[i]) {
+        var a = e.pts[i], b = e.pts[i + 1], f = e.seg[i] ? d / e.seg[i] : 0;
+        return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
+      }
+      d -= e.seg[i];
+    }
+    return e.pts[e.pts.length - 1];
+  }
+  var edgePaths = EDGES.map(parsePath);
+
+  function buildFlow(key) {
+    var f = FLOWS[key], host = $('#flow-' + key), svg = $('svg', host);
+    var defs = sv('defs');
+    var pat = sv('pattern', { id: 'fg-' + key, width: 10, height: 10, patternUnits: 'userSpaceOnUse' });
+    pat.appendChild(sv('circle', { cx: 1, cy: 1, r: .6, fill: 'rgba(216,208,197,.10)' }));
+    var mk = sv('marker', { id: 'fa-' + key, viewBox: '0 0 8 8', refX: 7, refY: 4, markerWidth: 7, markerHeight: 7, orient: 'auto' });
+    mk.appendChild(sv('path', { d: 'M0 0 L8 4 L0 8 z', fill: 'rgba(216,208,197,.7)' }));
+    defs.appendChild(pat); defs.appendChild(mk); svg.appendChild(defs);
+    svg.appendChild(sv('rect', { x: 0, y: 0, width: 600, height: 300, fill: 'url(#fg-' + key + ')' }));
+    f.lanes.forEach(function (name, i) {
+      svg.appendChild(sv('rect', { x: 0, y: 40 + i * 80, width: 600, height: 80, fill: 'none', stroke: 'rgba(216,208,197,.10)' }));
+      svg.appendChild(sv('text', { x: 10, y: 83 + i * 80, 'font-size': 8.5, 'letter-spacing': 1.4, fill: 'rgba(216,208,197,.42)' }, name));
+    });
+    svg.appendChild(sv('line', { x1: 78, y1: 40, x2: 78, y2: 280, stroke: 'rgba(216,208,197,.10)' }));
+    var edges = EDGES.map(function (d) {
+      var e = sv('path', { d: d, class: 'fe', 'marker-end': 'url(#fa-' + key + ')' });
+      svg.appendChild(e); return e;
+    });
+    f.edgeLabels.forEach(function (l) {
+      svg.appendChild(sv('text', { x: l[0], y: l[1], 'font-size': 8, fill: 'rgba(216,208,197,.5)', 'text-anchor': 'middle' }, l[2]));
+    });
+    var loop = sv('path', { d: f.loop[0], class: 'fl', 'marker-end': 'url(#fa-' + key + ')' });
+    svg.appendChild(loop);
+    svg.appendChild(sv('text', { x: f.loop[1], y: f.loop[2], 'font-size': 8, fill: 'rgba(224,104,94,.8)', 'text-anchor': 'middle' }, f.loop[3]));
+    var dot = sv('circle', { cx: 135, cy: 102, r: 4, fill: '#d8d0c5', opacity: 0 });
+    svg.appendChild(dot);
+    var tag = key === 'agent' ? 'A' : 'M';
+    var nodes = f.nodes.map(function (n, i) {
+      var g = sv('g', { class: 'fn' + (i === 3 ? ' gate' : '') + (i === 4 ? ' ship' : '') });
+      var cx, top;
+      if (i === 3) {
+        g.appendChild(sv('path', { d: 'M450 206 L508 240 L450 274 L392 240 Z' }));
+        g.appendChild(sv('text', { x: 450, y: 238, 'font-size': 8.5, 'text-anchor': 'middle', class: 'nt' }, n[0]));
+        g.appendChild(sv('text', { x: 450, y: 249, 'font-size': 7.5, 'text-anchor': 'middle', fill: 'rgba(216,208,197,.5)' }, n[1]));
+        g.appendChild(sv('text', { x: 392, y: 204, 'font-size': 7, fill: 'rgba(216,208,197,.35)' }, tag + '4'));
+      } else {
+        var b = NODES[i];
+        var r = sv('rect', { x: b[0], y: b[1], width: b[2], height: b[3], rx: 2 });
+        if (key === 'manual' && i === 1) r.setAttribute('stroke-dasharray', '3 2');
+        g.appendChild(r);
+        cx = b[0] + 46; top = b[1];
+        g.appendChild(sv('text', { x: cx, y: top + 17, 'font-size': 9, 'text-anchor': 'middle', class: 'nt' }, n[0]));
+        g.appendChild(sv('text', { x: cx, y: top + 31, 'font-size': 7.5, 'text-anchor': 'middle', fill: 'rgba(216,208,197,.5)' }, n[1]));
+        g.appendChild(sv('text', { x: b[0], y: top - 4, 'font-size': 7, fill: 'rgba(216,208,197,.35)' }, tag + (i + 1)));
+      }
+      svg.appendChild(g); return g;
+    });
+    return { key: key, f: f, nodes: nodes, edges: edges, loop: loop, dot: dot, state: $('[data-state]', host), loopPath: parsePath(f.loop[0]) };
+  }
+  var flows = ['agent', 'manual'].map(buildFlow);
+
+  function paintFlows(ft) {
+    flows.forEach(function (fl) {
+      var st = fl.f.script[ft] || [4];
+      var cur = st[0], red = !!st[2];
+      fl.nodes.forEach(function (g, i) {
+        var cls = 'fn' + (i === 3 ? ' gate' : '') + (i === 4 ? ' ship' : '');
+        if (i === cur) cls += ' on' + (i === 3 ? (red ? ' red' : ' ok') : '');
+        else if (i < cur) cls += ' past';
+        g.setAttribute('class', cls);
+      });
+      fl.edges.forEach(function (e, i) { e.setAttribute('class', 'fe' + (i < cur ? ' lit' : '')); });
+      fl.loop.setAttribute('class', 'fl' + (red ? ' red' : ''));
+      fl.state.textContent = red ? 'TESTS RED \u2192 BACK TO ' + fl.f.back : cur === 4 ? 'MERGED ON GREEN' : cur === 3 ? 'TESTS GREEN' : 'RUNNING\u2026';
+      fl.state.style.color = red ? '#e0685e' : cur === 4 ? '#b3a0d6' : cur === 3 ? '#41d183' : 'rgba(216,208,197,.42)';
+    });
+  }
+
+  var FLOW_TICK = 750, flowT = 0, flowStart = 0;
+  if (reduce) {
+    paintFlows(7);
+  } else {
+    paintFlows(0);
+    flowStart = performance.now();
+    setInterval(function () {
+      flowT = (flowT + 1) % 10;
+      flowStart = performance.now();
+      paintFlows(flowT);
+    }, FLOW_TICK);
+    (function ride() {
+      var p = Math.min(1, (performance.now() - flowStart) / 700);
+      flows.forEach(function (fl) {
+        var st = fl.f.script[flowT] || [4], e = st[1];
+        if (e === undefined) { fl.dot.setAttribute('opacity', 0); return; }
+        var path = e === 'L' ? fl.loopPath : edgePaths[e], xy = pointAt(path, p);
+        fl.dot.setAttribute('cx', xy[0]);
+        fl.dot.setAttribute('cy', xy[1]);
+        fl.dot.setAttribute('opacity', p < .08 ? p / .08 : p > .92 ? (1 - p) / .08 : 1);
+        fl.dot.setAttribute('fill', e === 'L' ? '#e0685e' : e === 3 ? '#41d183' : '#d8d0c5');
+      });
+      requestAnimationFrame(ride);
+    })();
   }
 
   // reveal on scroll

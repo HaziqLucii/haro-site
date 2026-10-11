@@ -89,62 +89,53 @@
     }, 750);
   }
 
-  // Dithered backdrop: a 3px-per-cell canvas, ordered 4x4 Bayer threshold over a slow warped field,
-  // drawn only near the hero, the gate section and the footer. Redrawn at most every 80ms (not on
-  // every scroll frame); under reduced motion the field is frozen at t=0.
+  // Dithered backdrop: one 3px-per-cell canvas inside each [data-dither] zone (hero, gate, footer),
+  // absolutely positioned so it scrolls with the page and never responds to scroll. Ordered 4x4 Bayer
+  // threshold over a slow warped field. Zones off screen are skipped; under reduced motion the field
+  // is drawn once at t=0.
   (function startDither() {
-    var cv = $('#dither');
-    if (!cv || !cv.getContext) return;
-    var ctx = cv.getContext('2d');
-    var S = 3, FADE = 520 / S, REACH = 240 / S;
+    var S = 3, FADE = 520 / S, REACH = 240, VH = 300;
     var BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(function (v) { return (v + .5) / 16; });
     var ON = new Uint32Array(new Uint8Array([216, 208, 197, 255]).buffer)[0];
-    var w = 0, h = 0, img = null, px = null, colWy = null, cleared = false;
-    var hosts = $$('[data-dither]');
     var N = 4096, K = N / (2 * Math.PI), LUT = new Float32Array(N);
     for (var q = 0; q < N; q++) LUT[q] = Math.sin(q / K);
     function sn(a) { return LUT[(a * K | 0) & (N - 1)]; }
     function cs(a) { return LUT[((a + 1.5707963267948966) * K | 0) & (N - 1)]; }
 
-    function size() {
-      w = Math.ceil(innerWidth / S);
-      h = Math.ceil(innerHeight / S);
-      cv.width = w;
-      cv.height = h;
-      img = ctx.createImageData(w, h);
-      px = new Uint32Array(img.data.buffer);
-      colWy = new Float32Array(w);
-      cleared = false;
-    }
-    size();
+    var zones = $$('[data-dither]').map(function (host) {
+      var cv = document.createElement('canvas');
+      cv.className = 'dither';
+      cv.setAttribute('aria-hidden', 'true');
+      host.insertBefore(cv, host.firstChild);
+      if (!cv.getContext) return null;
+      return { host: host, cv: cv, ctx: cv.getContext('2d'), w: 0, h: 0, img: null, px: null, colWy: null, vis: !window.IntersectionObserver, dirty: true };
+    }).filter(Boolean);
+    if (!zones.length) return;
 
-    function draw(t) {
-      var T = reduce ? 0 : t / 1000, sy = scrollY / innerHeight;
-      var zones = [];
-      hosts.forEach(function (e) {
-        var r = e.getBoundingClientRect(), a = r.top / S - REACH, b = r.bottom / S + REACH;
-        if (b > 0 && a < h) zones.push([a, b]);
-      });
-      if (!zones.length) {
-        if (!cleared) { px.fill(0); ctx.putImageData(img, 0, 0); cleared = true; }
-        return;
-      }
-      cleared = false;
-      var aspect = w / h * 3.2;
-      var x, y, i;
+    function size(z) {
+      var w = Math.ceil(z.host.offsetWidth / S), h = Math.ceil((z.host.offsetHeight + 2 * REACH) / S);
+      if (w === z.w && h === z.h) return;
+      z.w = z.cv.width = w;
+      z.h = z.cv.height = h;
+      z.img = z.ctx.createImageData(w, h);
+      z.px = new Uint32Array(z.img.data.buffer);
+      z.colWy = new Float32Array(w);
+      z.dirty = true;
+    }
+
+    function draw(z, t) {
+      var w = z.w, h = z.h, px = z.px, colWy = z.colWy, T = reduce ? 0 : t / 1000;
+      var aspect = w / VH * 3.2;
+      var x, y;
       for (x = 0; x < w; x++) {
         var ax = x / w * aspect;
         colWy[x] = 1.2 * cs(ax * 1.1 - T * .17) + .5 * sn(ax * 2.7 + T * .09);
       }
       for (y = 0; y < h; y++) {
-        var za = 0;
-        for (i = 0; i < zones.length; i++) {
-          var z = zones[i];
-          if (y >= z[0] && y < z[1]) za = Math.max(za, Math.min(1, Math.min(y - z[0], z[1] - y) / FADE));
-        }
+        var za = Math.min(1, Math.min(y, h - y) / FADE);
         var row = y * w;
         if (za <= 0) { px.fill(0, row, row + w); continue; }
-        var ay = (y / h + sy * .35) * 3.2;
+        var ay = y / VH * 3.2;
         var rowWx = 1.4 * sn(ay * 1.3 + T * .21) + .6 * sn(ay * 3.1 - T * .13);
         var nyA = y * .047, nyB = y * .083;
         for (x = 0; x < w; x++) {
@@ -159,27 +150,45 @@
           px[row + x] = v > BAYER[(y & 3) * 4 + (x & 3)] ? ON : 0;
         }
       }
-      ctx.putImageData(img, 0, 0);
+      z.ctx.putImageData(z.img, 0, 0);
+      z.dirty = false;
     }
 
-    var last = 0, timer = 0;
+    var now = 0, last = 0, pending = 0;
+    function paint(all) {
+      zones.forEach(function (z) {
+        size(z);
+        if (z.vis && (z.dirty || all)) draw(z, now);
+      });
+    }
     function frame(t) {
-      if (t - last >= 80) { last = t; draw(t); }
+      now = t;
+      if (t - last >= 80) { last = t; paint(true); }
       requestAnimationFrame(frame);
     }
-    function redraw() {
-      if (timer) return;
-      timer = setTimeout(function () { timer = 0; draw(0); }, 80);
+    function refresh() {
+      if (pending) return;
+      pending = requestAnimationFrame(function () { pending = 0; paint(false); });
     }
 
-    if (reduce) {
-      redraw();
-      addEventListener('scroll', redraw, { passive: true });
-      addEventListener('resize', function () { size(); redraw(); });
-    } else {
-      requestAnimationFrame(frame);
-      addEventListener('resize', size);
+    if (window.IntersectionObserver) {
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          zones.forEach(function (z) { if (z.cv === e.target) { z.vis = e.isIntersecting; if (z.vis) z.dirty = true; } });
+        });
+        refresh();
+      }, { rootMargin: '300px 0px' });
+      zones.forEach(function (z) { io.observe(z.cv); });
     }
+    if (window.ResizeObserver) {
+      var ro = new ResizeObserver(refresh);
+      zones.forEach(function (z) { ro.observe(z.host); });
+    } else {
+      addEventListener('resize', refresh);
+    }
+
+    paint(true);
+    if (!reduce) requestAnimationFrame(frame);
   })();
 
   // The two flow diagrams. Node 0..4 sit at fixed spots; the dot rides one edge per tick

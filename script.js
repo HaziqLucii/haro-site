@@ -75,7 +75,6 @@
       i.style.opacity = p >= NEED[i.dataset.kind] ? 1 : 0.12;
     });
     labels.forEach(function (l) { l.classList.toggle('on', p >= +l.dataset.need); });
-    $('#ml-gate').textContent = p >= 3 ? '3 · GATE · GREEN → 4 · MERGED' : '3 · GATE · GREEN';
   }
 
   var ticks = 0;
@@ -87,8 +86,101 @@
       ticks += 1;
       phase = Math.min(ticks % 6, 4);
       paintHero(phase);
-    }, 900);
+    }, 750);
   }
+
+  // Dithered backdrop: a 3px-per-cell canvas, ordered 4x4 Bayer threshold over a slow warped field,
+  // drawn only near the hero, the gate section and the footer. Redrawn at most every 80ms (not on
+  // every scroll frame); under reduced motion the field is frozen at t=0.
+  (function startDither() {
+    var cv = $('#dither');
+    if (!cv || !cv.getContext) return;
+    var ctx = cv.getContext('2d');
+    var S = 3, FADE = 520 / S, REACH = 240 / S;
+    var BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(function (v) { return (v + .5) / 16; });
+    var ON = new Uint32Array(new Uint8Array([216, 208, 197, 255]).buffer)[0];
+    var w = 0, h = 0, img = null, px = null, colWy = null, cleared = false;
+    var hosts = $$('[data-dither]');
+    var N = 4096, K = N / (2 * Math.PI), LUT = new Float32Array(N);
+    for (var q = 0; q < N; q++) LUT[q] = Math.sin(q / K);
+    function sn(a) { return LUT[(a * K | 0) & (N - 1)]; }
+    function cs(a) { return LUT[((a + 1.5707963267948966) * K | 0) & (N - 1)]; }
+
+    function size() {
+      w = Math.ceil(innerWidth / S);
+      h = Math.ceil(innerHeight / S);
+      cv.width = w;
+      cv.height = h;
+      img = ctx.createImageData(w, h);
+      px = new Uint32Array(img.data.buffer);
+      colWy = new Float32Array(w);
+      cleared = false;
+    }
+    size();
+
+    function draw(t) {
+      var T = reduce ? 0 : t / 1000, sy = scrollY / innerHeight;
+      var zones = [];
+      hosts.forEach(function (e) {
+        var r = e.getBoundingClientRect(), a = r.top / S - REACH, b = r.bottom / S + REACH;
+        if (b > 0 && a < h) zones.push([a, b]);
+      });
+      if (!zones.length) {
+        if (!cleared) { px.fill(0); ctx.putImageData(img, 0, 0); cleared = true; }
+        return;
+      }
+      cleared = false;
+      var aspect = w / h * 3.2;
+      var x, y, i;
+      for (x = 0; x < w; x++) {
+        var ax = x / w * aspect;
+        colWy[x] = 1.2 * cs(ax * 1.1 - T * .17) + .5 * sn(ax * 2.7 + T * .09);
+      }
+      for (y = 0; y < h; y++) {
+        var za = 0;
+        for (i = 0; i < zones.length; i++) {
+          var z = zones[i];
+          if (y >= z[0] && y < z[1]) za = Math.max(za, Math.min(1, Math.min(y - z[0], z[1] - y) / FADE));
+        }
+        var row = y * w;
+        if (za <= 0) { px.fill(0, row, row + w); continue; }
+        var ay = (y / h + sy * .35) * 3.2;
+        var rowWx = 1.4 * sn(ay * 1.3 + T * .21) + .6 * sn(ay * 3.1 - T * .13);
+        var nyA = y * .047, nyB = y * .083;
+        for (x = 0; x < w; x++) {
+          var nz = .5 + .5 * sn(x * .11 + nyA + T * .05) * sn(x * .029 - nyB);
+          var ef = Math.max(0, Math.min(1, za * 1.6 - .6 + nz * .6));
+          if (ef <= 0) { px[row + x] = 0; continue; }
+          ef = ef * ef * (3 - 2 * ef);
+          var wx = x / w * aspect + rowWx, wy = ay + colWy[x];
+          var v = .5 + .28 * sn(wx * 1.7 + cs(wy * 1.9 + T * .11) * 2.2) + .22 * sn(wy * 2.3 - wx * .8 + T * .07);
+          v = Math.max(0, (v - .42) * 1.9);
+          v = Math.min(1, v) * ef;
+          px[row + x] = v > BAYER[(y & 3) * 4 + (x & 3)] ? ON : 0;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+    }
+
+    var last = 0, timer = 0;
+    function frame(t) {
+      if (t - last >= 80) { last = t; draw(t); }
+      requestAnimationFrame(frame);
+    }
+    function redraw() {
+      if (timer) return;
+      timer = setTimeout(function () { timer = 0; draw(0); }, 80);
+    }
+
+    if (reduce) {
+      redraw();
+      addEventListener('scroll', redraw, { passive: true });
+      addEventListener('resize', function () { size(); redraw(); });
+    } else {
+      requestAnimationFrame(frame);
+      addEventListener('resize', size);
+    }
+  })();
 
   // The two flow diagrams. Node 0..4 sit at fixed spots; the dot rides one edge per tick
   // (script rows are [node on, edge the dot rides, red?]); red sends it back along the loop.

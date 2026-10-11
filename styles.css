@@ -25,7 +25,8 @@ img{max-width:100%}
 code{font-family:var(--mono);font-size:.9em;color:var(--ink)}
 h1,h2,h3,p{margin:0}
 
-.root{position:relative;overflow:hidden;background:var(--bg)}
+.root{position:relative;overflow:hidden;background:var(--bg);isolation:isolate}
+.dither{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:-1;image-rendering:pixelated;opacity:.045}
 .wrap{max-width:1180px;margin:0 auto}
 .grow{flex:1}
 .mono{font-family:var(--mono)}
@@ -78,9 +79,11 @@ h1{font-size:clamp(48px,7vw,104px);font-weight:500;letter-spacing:-.04em;line-he
 .mark-labels{position:relative;height:204px;width:210px}
 .ml{position:absolute;left:0;display:flex;align-items:center;gap:10px;opacity:.25;transition:opacity .4s ease}
 .ml i{width:18px;height:1px;background:rgba(216,208,197,.3)}
-.ml span{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--i66);white-space:nowrap}
+.ml span{height:20px;display:flex;align-items:center;gap:6px;padding:0 8px;border:1px solid var(--l16);border-radius:2px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--i66);white-space:nowrap}
+.ml span b{font-weight:400;color:rgba(216,208,197,.45)}
 .ml.on{opacity:1}
-.ml[data-need="2"].on span{color:var(--green)}
+.ml.on span{border-color:rgba(216,208,197,.3);color:var(--ink)}
+.ml-gate.on span{border-color:var(--green);background:rgba(65,209,131,.08);color:var(--green)}
 
 
 .flows{margin-top:80px}

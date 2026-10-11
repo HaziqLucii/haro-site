@@ -20,6 +20,7 @@
 </head>
 <body>
 <div class="root">
+  <canvas class="dither" id="dither" aria-hidden="true"></canvas>
   <a class="skip" href="#main">Skip to content</a>
 
   <nav class="nav" aria-label="Main">
@@ -40,7 +41,7 @@
     <a class="btn btn-fill btn-sm" href="#download">Download</a>
   </nav>
 
-  <header class="hero" id="top">
+  <header class="hero" id="top" data-dither>
     <div class="watermark" aria-hidden="true">モノクローム</div>
     <div class="side-note" aria-hidden="true">// haro · you stay the author · linux first</div>
     <div class="wrap hero-grid">
@@ -55,11 +56,12 @@
       </div>
       <div class="reveal d1 hero-mark-wrap">
         <div class="hero-mark">
-          <div class="mark mark-hero" data-mark="4" data-phase="hero" role="img" aria-label="The haro mark: queued, running, gate green, merged"></div>
+          <div class="mark mark-hero" data-mark="4" data-phase="hero" role="img" aria-label="The haro mark: queued, running, review green, merged"></div>
           <div class="mark-labels" aria-hidden="true">
-            <div class="ml" data-need="0" style="top:13px"><i></i><span>1 · QUEUED</span></div>
-            <div class="ml" data-need="1" style="top:101px"><i></i><span>2 · RUNNING</span></div>
-            <div class="ml" data-need="2" style="top:183px"><i></i><span id="ml-gate">3 · GATE · GREEN</span></div>
+            <div class="ml" data-need="0" style="top:1px"><i></i><span><b>1</b>QUEUED</span></div>
+            <div class="ml" data-need="1" style="top:89px"><i></i><span><b>2</b>RUNNING</span></div>
+            <div class="ml ml-gate" data-need="2" style="top:160px"><i></i><span><b>3</b>REVIEW · GREEN</span></div>
+            <div class="ml" data-need="3" style="top:186px"><i></i><span><b>4</b>MERGED</span></div>
           </div>
         </div>
       </div>
@@ -187,7 +189,7 @@
       </div>
     </section>
 
-    <section id="gate" class="sec">
+    <section id="gate" class="sec" data-dither>
       <div class="wrap two reveal">
         <div>
           <div class="eyebrow">06 · THE GATE</div>
@@ -346,7 +348,7 @@
     </section>
   </main>
 
-  <footer class="foot">
+  <footer class="foot" data-dither>
     <div class="wrap foot-in">
       <div class="foot-brand">
         <span class="mark mark-foot" data-mark="1" aria-hidden="true"></span>

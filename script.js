@@ -371,6 +371,91 @@
     secs.forEach(function (s) { so.observe(s); });
   }
 
+  // themes: tabs recolour the section; auto-cycles only while in view, until the visitor picks one
+  (function themes() {
+    var sec = $('#themes');
+    if (!sec) return;
+    var tabs = $$('.t-tab', sec), panels = $$('.t-panel', sec);
+    var picked = false, inView = false, cur = 0, timer = null;
+    var blobs = [];
+
+    function select(i, focus) {
+      cur = i;
+      sec.dataset.theme = tabs[i].dataset.theme;
+      tabs.forEach(function (t, k) {
+        t.setAttribute('aria-selected', k === i ? 'true' : 'false');
+        t.tabIndex = k === i ? 0 : -1;
+      });
+      panels.forEach(function (p, k) { p.classList.toggle('on', k === i); });
+      if (focus) tabs[i].focus();
+      morph();
+    }
+
+    function morph() {
+      var run = !reduce && inView && cur === 1;
+      blobs.forEach(function (a) { if (run) a.play(); else a.pause(); });
+    }
+
+    tabs.forEach(function (t, i) {
+      t.addEventListener('click', function () { picked = true; select(i); });
+      t.addEventListener('keydown', function (e) {
+        var n = tabs.length, to = -1;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') to = (i + 1) % n;
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') to = (i + n - 1) % n;
+        else if (e.key === 'Home') to = 0;
+        else if (e.key === 'End') to = n - 1;
+        if (to < 0) return;
+        e.preventDefault();
+        picked = true;
+        select(to, true);
+      });
+    });
+
+    if (!reduce && sec.animate) {
+      [['blob-a', ['38% 62% 55% 45% / 45% 40% 60% 55%', '50%', '62% 38% 40% 60% / 55% 60% 40% 45%'], 14000, 1],
+       ['blob-b', ['50% 50% 50% 12px', '30% 70% 70% 30% / 30% 30% 70% 70%', '50%'], 11000, -1],
+       ['blob-c', ['999px 999px 40px 40px', '40px 999px 999px 40px', '999px 40px 40px 999px'], 16000, 1],
+       ['blob-d', ['32px', '50%', '50% 50% 50% 8px'], 9000, -1]].forEach(function (b) {
+        var shapes = b[1].concat([b[1][0]]);
+        var a = document.getElementById(b[0]).animate(shapes.map(function (r, i) {
+          return { borderRadius: r, transform: 'rotate(' + (b[3] * 360 * i / (shapes.length - 1)) + 'deg) scale(' + (i % 2 ? 1.08 : 1) + ')' };
+        }), { duration: b[2], iterations: Infinity, easing: 'ease-in-out' });
+        a.pause();
+        blobs.push(a);
+      });
+    }
+
+    if (!reduce) {
+      timer = setInterval(function () {
+        if (picked || !inView || sec.contains(document.activeElement)) return;
+        select((cur + 1) % tabs.length);
+      }, 5200);
+    }
+
+    // hidden panels do not trigger their web fonts, and a late font would re-wrap their text
+    function loadFonts() {
+      if (!document.fonts || !document.fonts.load) return;
+      ['500 16px "Roboto Flex"', '800 16px "Roboto Flex"', '400 12px "Roboto Mono"', '500 16px Geist', '600 16px Geist', '400 12px "Geist Mono"'].forEach(function (f) { document.fonts.load(f); });
+    }
+    if ('IntersectionObserver' in window) {
+      var pre = new IntersectionObserver(function (es) {
+        if (!es[0].isIntersecting) return;
+        loadFonts();
+        pre.disconnect();
+      }, { rootMargin: '1500px 0px' });
+      pre.observe(sec);
+    } else {
+      loadFonts();
+    }
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        inView = es[0].isIntersecting;
+        morph();
+      }, { threshold: 0.3 }).observe(sec);
+    }
+  })();
+
   // gate demo
   var gate = $('#gate-demo'), gN = 0, gTimer = null, gRan = false;
   function paintGate(done, run) {

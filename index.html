@@ -33,6 +33,7 @@
       <a href="#receipt">Receipt</a>
       <a href="#gate">Gate</a>
       <a href="#agent">Agent</a>
+      <a href="#themes">Themes</a>
       <a href="#download">Download</a>
     </div>
     <span class="grow"></span>
@@ -301,10 +302,94 @@
       </div>
     </section>
 
+    <section id="themes" class="sec themes" data-theme="classic">
+      <div class="t-bg" aria-hidden="true">
+        <div class="t-decor t-d0">
+          <div class="t-kanji">モノクローム</div>
+          <div class="t-dots"></div>
+        </div>
+        <div class="t-decor t-d1">
+          <i class="t-blob" id="blob-a"></i><i class="t-blob" id="blob-b"></i><i class="t-blob" id="blob-c"></i><i class="t-blob" id="blob-d"></i>
+        </div>
+        <div class="t-decor t-d2">
+          <div class="t-rules"></div><div class="t-margin"></div>
+          <div class="t-stamp">MERGED<br>ON GREEN</div>
+        </div>
+      </div>
+      <div class="wrap">
+        <div class="two">
+          <div>
+            <div class="t-eyebrow">11 · THEMES</div>
+            <h2 class="t-h2">Three looks.<br>Same haro.</h2>
+          </div>
+          <p class="t-lead"><span class="t-ls t-ls-classic">Choose one in Settings &gt; Display &gt; Theme. It applies at once and keeps your work. Each theme has its own start and quit screens.</span><span class="t-ls t-ls-expressive">Choose one in Settings &gt; Display &gt; Theme. It applies at once and keeps your work. Each theme has its own start and quit screens.</span><span class="t-ls t-ls-paper">Choose one in Settings &gt; Display &gt; Theme. It applies at once and keeps your work. Each theme has its own start and quit screens.</span></p>
+        </div>
+        <div class="t-tabs" role="tablist" aria-label="Theme">
+          <button type="button" class="t-tab" role="tab" id="tab-classic" aria-selected="true" aria-controls="panel-classic" data-theme="classic"><span class="t-dot" style="background:#d8d0c5"></span>Classic</button>
+          <button type="button" class="t-tab" role="tab" id="tab-expressive" aria-selected="false" aria-controls="panel-expressive" tabindex="-1" data-theme="expressive"><span class="t-dot" style="background:#d0bcff"></span>Expressive</button>
+          <button type="button" class="t-tab" role="tab" id="tab-paper" aria-selected="false" aria-controls="panel-paper" tabindex="-1" data-theme="paper"><span class="t-dot" style="background:#ffffff"></span>Paper</button>
+        </div>
+        <div class="t-grid">
+          <figure class="t-fig">
+          <div class="t-win" role="img" aria-label="Illustration of the haro window in the selected theme: a sidebar, the four step bar, a green verdict and a merge button. Not a screenshot.">
+            <div class="t-bar"><span class="t-logo">haro.</span><span class="grow"></span><span class="t-chip" style="width:70px"></span><span class="t-pri" style="width:46px"></span></div>
+            <div class="t-body">
+              <div class="t-side"><span class="t-chip" style="width:70%"></span><span class="t-chip" style="width:86%"></span><span class="t-pri" style="width:60%"></span><span class="t-chip" style="width:78%"></span><span class="t-chip" style="width:54%"></span></div>
+              <div class="t-main">
+                <div class="t-steps"><span class="t-chip"></span><span class="t-chip"></span><span class="t-grn"></span><span class="t-chip"></span></div>
+                <div class="t-verdict"><span class="t-sq"></span><span class="t-key">GREEN</span></div>
+                <div class="t-head">All 18 tests pass</div>
+                <div class="t-acts"><span class="t-pri" style="width:90px;height:22px"></span><span class="t-ghost" style="width:70px;height:22px"></span></div>
+              </div>
+              <div class="t-right"><span class="t-chip t-r2" style="height:34px"></span><span class="t-chip t-r2" style="height:22px"></span><span class="t-chip t-r2" style="height:22px"></span></div>
+            </div>
+          </div>
+            <figcaption>illustration of the layout, not a screenshot</figcaption>
+          </figure>
+          <div class="t-panels">
+            <div class="t-panel on" id="panel-classic" role="tabpanel" aria-labelledby="tab-classic">
+              <div class="t-name">Classic</div>
+              <p class="t-desc">The default. Warm monochrome on near-black, thin lines, mono labels and fades only.</p>
+              <dl class="t-spec">
+                <dt>type</dt><dd>Space Grotesk, Space Mono, Fraunces</dd>
+                <dt>shape</dt><dd>2px corners, 1px lines</dd>
+                <dt>motion</dt><dd>fades only</dd>
+                <dt>start and quit</dt><dd>the mark assembles like a gate run</dd>
+                <dt>palette</dt><dd class="t-pal" role="img" aria-label="Classic palette: Surface, Ink, Gate green, Red, Merged"><span class="t-sw" style="background:#0b0a09" title="Surface"></span><span class="t-sw" style="background:#d8d0c5" title="Ink"></span><span class="t-sw" style="background:#41d183" title="Gate green"></span><span class="t-sw" style="background:#e0685e" title="Red"></span><span class="t-sw" style="background:#b3a0d6" title="Merged"></span></dd>
+              </dl>
+            </div>
+            <div class="t-panel" id="panel-expressive" role="tabpanel" aria-labelledby="tab-expressive">
+              <div class="t-name">Expressive</div>
+              <p class="t-desc">Follows Material 3 (Material You) design: deep purple surfaces and a lilac primary by default, pill buttons and a ripple on every press.</p>
+              <dl class="t-spec">
+                <dt>type</dt><dd>Roboto Flex, Roboto Mono</dd>
+                <dt>shape</dt><dd>pill buttons, 16 to 28px cards</dd>
+                <dt>motion</dt><dd>a ripple on every press</dd>
+                <dt>start and quit</dt><dd>a shape morphs into the mark, and quitting winds it down</dd>
+                <dt>palette</dt><dd class="t-pal" role="img" aria-label="Expressive palette: Surface, Primary, Secondary container, Gate green, Red"><span class="t-sw" style="background:#141218" title="Surface"></span><span class="t-sw" style="background:#d0bcff" title="Primary"></span><span class="t-sw" style="background:#4a4458" title="Secondary container"></span><span class="t-sw" style="background:#41d183" title="Gate green"></span><span class="t-sw" style="background:#e0685e" title="Red"></span></dd>
+                <dt>colours</dt><dd><ul class="t-cols" aria-label="Six colour options, each generating the whole palette"><li><span class="t-sw" style="background:#d0bcff"></span>Purple</li><li><span class="t-sw" style="background:#e1bae0"></span>Magenta</li><li><span class="t-sw" style="background:#f5b6c2"></span>Rose</li><li><span class="t-sw" style="background:#b6c6ed"></span>Blue</li><li><span class="t-sw" style="background:#9cd0d8"></span>Cyan</li><li><span class="t-sw" style="background:#ffffff"></span>Graphite</li></ul></dd>
+              </dl>
+            </div>
+            <div class="t-panel" id="panel-paper" role="tabpanel" aria-labelledby="tab-paper">
+              <div class="t-name">Paper</div>
+              <p class="t-desc">A light theme: white and warm grey, near-black ink and 6px corners.</p>
+              <dl class="t-spec">
+                <dt>type</dt><dd>Geist, Geist Mono</dd>
+                <dt>shape</dt><dd>6px corners, hairlines</dd>
+                <dt>motion</dt><dd>no ripple</dd>
+                <dt>start and quit</dt><dd>the mark is inked like a stamp, and quitting prints a receipt</dd>
+                <dt>palette</dt><dd class="t-pal" role="img" aria-label="Paper palette: Surface, Ink, Gate green, Red, Merged"><span class="t-sw" style="background:#ffffff" title="Surface"></span><span class="t-sw" style="background:#18181b" title="Ink"></span><span class="t-sw" style="background:#15803d" title="Gate green"></span><span class="t-sw" style="background:#dc2626" title="Red"></span><span class="t-sw" style="background:#7c3aed" title="Merged"></span></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section id="download" class="sec">
       <div class="wrap two reveal">
         <div>
-          <div class="eyebrow">11 · DOWNLOAD</div>
+          <div class="eyebrow">12 · DOWNLOAD</div>
           <h2>Download</h2>
         </div>
         <p class="copy">v0.11.0 for Linux x86_64. Build from source: <a class="ul" href="https://github.com/HaziqLucii/haro-oss">github.com/HaziqLucii/haro-oss</a></p>
@@ -355,6 +440,7 @@
       </div>
       <div class="foot-links"><a href="https://github.com/HaziqLucii/haro-oss">GitHub</a><a href="#download">Download</a><a href="#faq">FAQ</a><span class="mono tiny">MIT</span></div>
     </div>
+    <div class="wrap foot-note mono tiny dim">Expressive follows Google’s open Material 3 design system. haro is not affiliated with or endorsed by Google.</div>
   </footer>
 
   <div class="lb" id="lb" hidden>

@@ -377,7 +377,65 @@
     if (!sec) return;
     var tabs = $$('.t-tab', sec), panels = $$('.t-panel', sec);
     var picked = false, inView = false, cur = 0, timer = null;
-    var blobs = [];
+    var blobs = [
+      { el: $('#blob-a path'), seg: 2200, off: 0 },
+      { el: $('#blob-b path'), seg: 1700, off: 3400 },
+      { el: $('#blob-c path'), seg: 2600, off: 5200 },
+      { el: $('#blob-d path'), seg: 1400, off: 2100 }
+    ];
+    var t0 = 0, raf = 0, elapsed = 0;
+
+    // same shapes and easing as the haro agent loader: circle, 4-lobe flower, squircle star,
+    // rounded triangle, superellipse, each morphing into the next with a quarter turn
+    var N = 96, TAU = Math.PI * 2;
+    var SHAPES = [
+      function () { return 1; },
+      function (th) { return 1.08 * (0.6 + 0.4 * Math.pow((1 + Math.cos(4 * th)) / 2, 2.6)); },
+      function (th) { return 0.84 - 0.16 * Math.cos(4 * th); },
+      function (th) { return 0.86 + 0.14 * Math.cos(3 * th - Math.PI / 2); },
+      function (th) { return 0.94 * Math.pow(Math.pow(Math.abs(Math.cos(th)), 4) + Math.pow(Math.abs(Math.sin(th)), 4), -0.25); }
+    ];
+    var RADII = SHAPES.map(function (f) {
+      var r = [];
+      for (var i = 0; i < N; i++) r.push(f(i / N * TAU));
+      return r;
+    });
+    function bez(x1, y1, x2, y2) {
+      return function (x) {
+        var lo = 0, hi = 1, t = x;
+        for (var k = 0; k < 22; k++) {
+          t = (lo + hi) / 2;
+          var cx = 3 * x1 * t * (1 - t) * (1 - t) + 3 * x2 * t * t * (1 - t) + t * t * t;
+          if (cx < x) lo = t; else hi = t;
+        }
+        return 3 * y1 * t * (1 - t) * (1 - t) + 3 * y2 * t * t * (1 - t) + t * t * t;
+      };
+    }
+    var EMPH = bez(0.2, 0, 0, 1), HOLD = 0.22;
+    function f4(n) { return n.toFixed(4); }
+    function shapeAt(ms, SEG) {
+      var n = SHAPES.length, seg = Math.floor(ms / SEG), f = (ms % SEG) / SEG;
+      var i = seg % n, j = (i + 1) % n;
+      var m = f < HOLD ? 0 : (f - HOLD) / (1 - HOLD), e = EMPH(m);
+      var rot = (seg + e) * Math.PI / 2, sc = 1 - 0.1 * Math.sin(Math.PI * Math.min(1, m * 1.15));
+      var p = [];
+      for (var k = 0; k < N; k++) {
+        var r = RADII[i][k] + (RADII[j][k] - RADII[i][k]) * e, th = k / N * TAU + rot;
+        p.push([Math.cos(th) * r * sc, Math.sin(th) * r * sc]);
+      }
+      var d = 'M' + f4(p[0][0]) + ' ' + f4(p[0][1]);
+      for (var q = 0; q < N; q++) {
+        var p0 = p[(q - 1 + N) % N], p1 = p[q], p2 = p[(q + 1) % N], p3 = p[(q + 2) % N];
+        d += 'C' + f4(p1[0] + (p2[0] - p0[0]) / 6) + ' ' + f4(p1[1] + (p2[1] - p0[1]) / 6) + ' ' +
+          f4(p2[0] - (p3[0] - p1[0]) / 6) + ' ' + f4(p2[1] - (p3[1] - p1[1]) / 6) + ' ' + f4(p2[0]) + ' ' + f4(p2[1]);
+      }
+      return d + 'Z';
+    }
+    function tick(now) {
+      var t = now - t0;
+      blobs.forEach(function (b) { b.el.setAttribute('d', shapeAt(b.off + t, b.seg)); });
+      raf = requestAnimationFrame(tick);
+    }
 
     function select(i, focus) {
       cur = i;
@@ -393,7 +451,14 @@
 
     function morph() {
       var run = !reduce && inView && cur === 1;
-      blobs.forEach(function (a) { if (run) a.play(); else a.pause(); });
+      if (run && !raf) {
+        t0 = performance.now() - elapsed;
+        raf = requestAnimationFrame(tick);
+      } else if (!run && raf) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+        elapsed = performance.now() - t0;
+      }
     }
 
     tabs.forEach(function (t, i) {
@@ -411,19 +476,7 @@
       });
     });
 
-    if (!reduce && sec.animate) {
-      [['blob-a', ['38% 62% 55% 45% / 45% 40% 60% 55%', '50%', '62% 38% 40% 60% / 55% 60% 40% 45%'], 14000, 1],
-       ['blob-b', ['50% 50% 50% 12px', '30% 70% 70% 30% / 30% 30% 70% 70%', '50%'], 11000, -1],
-       ['blob-c', ['999px 999px 40px 40px', '40px 999px 999px 40px', '999px 40px 40px 999px'], 16000, 1],
-       ['blob-d', ['32px', '50%', '50% 50% 50% 8px'], 9000, -1]].forEach(function (b) {
-        var shapes = b[1].concat([b[1][0]]);
-        var a = document.getElementById(b[0]).animate(shapes.map(function (r, i) {
-          return { borderRadius: r, transform: 'rotate(' + (b[3] * 360 * i / (shapes.length - 1)) + 'deg) scale(' + (i % 2 ? 1.08 : 1) + ')' };
-        }), { duration: b[2], iterations: Infinity, easing: 'ease-in-out' });
-        a.pause();
-        blobs.push(a);
-      });
-    }
+    blobs.forEach(function (b) { b.el.setAttribute('d', shapeAt(b.off, b.seg)); });
 
     if (!reduce) {
       timer = setInterval(function () {

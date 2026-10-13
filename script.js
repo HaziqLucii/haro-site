@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  var REL = 'https://github.com/HaziqLucii/haro-oss/releases/download/v0.11.0/';
+  var REL = 'https://github.com/HaziqLucii/haro-oss/releases/download/v0.15.0/';
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Glyph units: x 0..56, y 0..51. kind: d dots, c cells, g gate, b bar.
@@ -27,8 +27,8 @@
   ];
 
   var INSTALLS = [
-    ['AppImage', 'curl -LO ' + REL + 'haro-0.11.0-x86_64.AppImage && chmod +x haro-0.11.0-x86_64.AppImage && ./haro-0.11.0-x86_64.AppImage', REL + 'haro-0.11.0-x86_64.AppImage'],
-    ['Tarball', 'curl -L ' + REL + 'haro-0.11.0-linux-x86_64.tar.gz | tar xz && ./haro-0.11.0-linux-x86_64/install.sh', REL + 'haro-0.11.0-linux-x86_64.tar.gz']
+    ['AppImage', 'curl -LO ' + REL + 'haro-0.15.0-x86_64.AppImage && chmod +x haro-0.15.0-x86_64.AppImage && ./haro-0.15.0-x86_64.AppImage', REL + 'haro-0.15.0-x86_64.AppImage'],
+    ['Tarball', 'curl -L ' + REL + 'haro-0.15.0-linux-x86_64.tar.gz | tar xz && ./haro-0.15.0-linux-x86_64/install.sh', REL + 'haro-0.15.0-linux-x86_64.tar.gz']
   ];
 
   var FAQ = [
